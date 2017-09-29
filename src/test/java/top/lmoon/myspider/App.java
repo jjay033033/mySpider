@@ -1,4 +1,4 @@
-package top.lmoon.mySpider;
+package top.lmoon.myspider;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
