@@ -22,7 +22,7 @@ public class ApeSpider2 implements PageProcessor {
 		String title = "";
 		String[] remarks = remark.split(" - ");
 		if(remarks.length>1){
-			singer = remarks[0];
+			singer = remarks[0].replace("/", "&").replace("\\", "*");
 			int indexTitle = remarks[1].indexOf(".");
 			if(indexTitle>-1){
 				title = remarks[1].substring(0, indexTitle);

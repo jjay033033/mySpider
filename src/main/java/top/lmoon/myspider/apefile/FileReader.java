@@ -49,8 +49,8 @@ public class FileReader {
 							props[7], props[8], props[9], props[10]);
 					list.add(vo);
 				}
-			} catch (IOException e) {
-				logger.error("读数据出错:",e);
+			} catch (Exception e) {
+				logger.error("读数据出错:"+fileName,e);
 			}
 		}
 		return list;
