@@ -35,6 +35,7 @@ public class DBPipeline implements Pipeline {
 			String album = MapUtils.getString(map, "album", "");
 			String size = MapUtils.getString(map, "size", "");
 			String language = MapUtils.getString(map, "language", "");
+			String url = MapUtils.getString(map, "url", "");
 			if (StringUtils.isBlank(singer.trim())) {
 				singer = "其他";
 			}
@@ -42,7 +43,7 @@ public class DBPipeline implements Pipeline {
 			int singerId = SingerIdFactory.getInstance().getSingerId(singer);
 			int songIdForSinger = SongIdFactory.getInstance().getSongIdForSinger(singerId);
 			ApeInfoVO vo = new ApeInfoVO(songId, singerId, songIdForSinger, singer, title, link, pw, album, size,
-					language, remark);
+					language, remark,url);
 			apeInfoDAO.insert(vo);
 		} catch (Exception e) {
 			logger.error("", e);

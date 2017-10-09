@@ -50,7 +50,7 @@ public class FileReader {
 					props = readLine.split(SysConstants.COLUMN_SYMBOL);
 					ApeInfoVO vo = new ApeInfoVO(Integer.parseInt(props[0]), Integer.parseInt(props[1]),
 							Integer.parseInt(props[2]), props[3], props[4], props[5], props[6], props[7], props[8],
-							props[9], props[10]);
+							props[9], props[10], props[11]);
 					list.add(vo);
 				}
 			} catch (Exception e) {

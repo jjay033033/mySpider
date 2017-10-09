@@ -15,7 +15,7 @@ public class SingerIdFactory {
 
 	private static ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<String, Integer>();
 
-	private static AtomicInteger counter = new AtomicInteger(1);
+	private static AtomicInteger counter = new AtomicInteger(0);
 
 	private static SingerIdFactory instance;
 
@@ -44,6 +44,14 @@ public class SingerIdFactory {
 			}
 		}
 		return id;
+	}
+	
+	public static void setMap(ConcurrentHashMap<String, Integer> map){
+		SingerIdFactory.map = map;
+	}
+	
+	public static void setCounter(int num){
+		counter.set(num);;
 	}
 
 }

@@ -37,11 +37,9 @@
 			<version>2.5</version>
 		</dependency>
 		<dependency>
-			<groupId>h2-db</groupId>
-			<artifactId>h2-db</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<version>1.4.196</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/h2-1.4.196.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

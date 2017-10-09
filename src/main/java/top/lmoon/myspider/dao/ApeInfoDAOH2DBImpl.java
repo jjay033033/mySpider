@@ -8,12 +8,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.lmoon.jdbc.JdbcTemplate;
+import top.lmoon.jdbc.ResultSetExtractor;
 import top.lmoon.jdbc.RowMapper;
 import top.lmoon.myspider.util.DbConnectionUtil;
 import top.lmoon.myspider.vo.ApeInfoVO;
@@ -31,10 +33,10 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 
 	public int insert(ApeInfoVO vo) {
 		String sql = "insert into apeinfo(songId,singerId,songIdForSinger,singer,"
-				+ "title,link,pw,album,size,language,remark) values (?,?,?,?,?,?,?,?,?,?,?)";
+				+ "title,link,pw,album,size,language,remark,url) values (?,?,?,?,?,?,?,?,?,?,?,?)";
 		Object[] params = new Object[] { vo.getSongId(), vo.getSingerId(), vo.getSongIdForSinger(), vo.getSinger(),
-				vo.getTitle(), vo.getLink(), vo.getPw(), vo.getAlbum(), vo.getSize(), vo.getLanguage(),
-				vo.getRemark() };
+				vo.getTitle(), vo.getLink(), vo.getPw(), vo.getAlbum(), vo.getSize(), vo.getLanguage(), vo.getRemark(),
+				vo.getUrl() };
 		return JdbcTemplate.executeUpdate(DbConnectionUtil.getConnection(), sql, params);
 	}
 
@@ -68,6 +70,7 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 				vo.setSongId(rs.getInt("songId"));
 				vo.setSongIdForSinger(rs.getInt("songIdForSinger"));
 				vo.setTitle(rs.getString("title"));
+				vo.setUrl(rs.getString("url"));
 				return vo;
 			}
 		}, paramsList.toArray());
@@ -77,7 +80,7 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 		Connection connection = DbConnectionUtil.getConnection();
 		String sql = "CREATE TABLE IF NOT EXISTS apeinfo (songId int PRIMARY KEY NOT NULL,singerId int,songIdForSinger int,"
 				+ "singer varchar(64),title varchar(64),link varchar(64),pw varchar(8),"
-				+ "album varchar(64),size varchar(16),language varchar(16),remark varchar(1024))";
+				+ "album varchar(64),size varchar(16),language varchar(16),remark varchar(1024),url varchar(64))";
 		return JdbcTemplate.executeUpdate(connection, sql, new Object[0]);
 	}
 
@@ -94,6 +97,60 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 			paramsList.add(title);
 		}
 		return JdbcTemplate.queryForInt(DbConnectionUtil.getConnection(), sql.toString(), paramsList.toArray());
+	}
+
+	@Override
+	public int selectMaxSingerId() {
+		String sql = "select max(singerId) from apeinfo";
+		return JdbcTemplate.queryForInt(DbConnectionUtil.getConnection(), sql, new Object[0]);
+	}
+
+	@Override
+	public ConcurrentHashMap<String, Integer> selectSingerIdMap() {
+		String sql = "select singerId,singer from apeinfo group by singerId";
+		return JdbcTemplate.queryForT(DbConnectionUtil.getConnection(), sql,
+				new ResultSetExtractor<ConcurrentHashMap<String, Integer>>() {
+
+					@Override
+					public ConcurrentHashMap<String, Integer> extract(ResultSet rs) throws SQLException {
+						ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+						while(rs!=null&&rs.next()){
+							String singer = rs.getString("singer");
+							int singerId = rs.getInt("singerId");
+							if(!StringUtils.isBlank(singer)&&singerId!=0){
+								map.put(singer, singerId);
+							}
+						}
+						return map;
+					}
+				}, new Object[0]);
+	}
+
+	@Override
+	public int selectMaxSongId() {
+		String sql = "select max(songId) from apeinfo";
+		return JdbcTemplate.queryForInt(DbConnectionUtil.getConnection(), sql, new Object[0]);
+	}
+
+	@Override
+	public ConcurrentHashMap<Integer, Integer> selectSongIdForSingerMap() {
+		String sql = "select singerId,max(songIdForSinger) songIdForSinger from apeinfo group by singerId";
+		return JdbcTemplate.queryForT(DbConnectionUtil.getConnection(), sql,
+				new ResultSetExtractor<ConcurrentHashMap<Integer, Integer>>() {
+
+					@Override
+					public ConcurrentHashMap<Integer, Integer> extract(ResultSet rs) throws SQLException {
+						ConcurrentHashMap<Integer, Integer> map = new ConcurrentHashMap<>();
+						while(rs!=null&&rs.next()){
+							int songIdForSinger = rs.getInt("songIdForSinger");
+							int singerId = rs.getInt("singerId");
+							if(songIdForSinger!=0&&singerId!=0){
+								map.put(singerId, songIdForSinger);
+							}
+						}
+						return map;
+					}
+				}, new Object[0]);
 	}
 
 }

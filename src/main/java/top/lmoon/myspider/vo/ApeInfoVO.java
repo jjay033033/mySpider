@@ -23,11 +23,12 @@ public class ApeInfoVO {
 	private String size;
 	private String language;
 	private String remark;	
+	private String url;
 	
 	public ApeInfoVO(){}
 	
 	public ApeInfoVO(int songId, int singerId, int songIdForSinger, String singer, String title, String link,
-			String pw, String album, String size, String language, String remark) {
+			String pw, String album, String size, String language, String remark,String url) {
 		super();
 		this.songId = songId;
 		this.singerId = singerId;
@@ -40,6 +41,7 @@ public class ApeInfoVO {
 		this.size = size;
 		this.language = language;
 		this.remark = remark;
+		this.url = url;
 	}
 	
 	public int getSongId() {
@@ -109,11 +111,19 @@ public class ApeInfoVO {
 		this.language = language;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	@Override
 	public String toString() {
 		return "ApeInfoVO [songId=" + songId + ", singerId=" + singerId + ", songIdForSinger=" + songIdForSinger
 				+ ", singer=" + singer + ", title=" + title + ", link=" + link + ", pw=" + pw + ", album=" + album
-				+ ", size=" + size + ", language=" + language + ", remark=" + remark + "]";
+				+ ", size=" + size + ", language=" + language + ", remark=" + remark + ", url=" + url + "]";
 	}
 
 }
