@@ -17,7 +17,7 @@ public class SongIdFactory {
 
 	private static ConcurrentHashMap<Integer, Integer> map = new ConcurrentHashMap<Integer, Integer>();
 
-	// private static AtomicInteger counter = new AtomicInteger(1);
+	private static AtomicInteger counter = new AtomicInteger(1);
 
 	private static SongIdFactory instance;
 
@@ -35,16 +35,16 @@ public class SongIdFactory {
 		return instance;
 	}
 
-	public String getSongId() {
-		return CommonUtil.getUUID();
+	public int getSongId() {
+		return counter.getAndIncrement();
 	}
 
 	public int getSongIdForSinger(int singerId) {
 		int id = 1;
 		synchronized (map) {
 			Integer preId = map.get(singerId);
-			if(preId!=null){
-				id = preId+1;
+			if (preId != null) {
+				id = preId + 1;
 			}
 			map.put(singerId, id);
 		}

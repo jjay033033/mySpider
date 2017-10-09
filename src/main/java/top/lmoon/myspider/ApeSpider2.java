@@ -1,6 +1,8 @@
 package top.lmoon.myspider;
 
+import top.lmoon.myspider.h2db.H2DBServer;
 import top.lmoon.myspider.pipeline.FilePipeline;
+import top.lmoon.myspider.util.CommonUtil;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Site;
@@ -22,7 +24,7 @@ public class ApeSpider2 implements PageProcessor {
 		String title = "";
 		String[] remarks = remark.split(" - ");
 		if(remarks.length>1){
-			singer = remarks[0].replace("/", "&").replace("\\", "*");
+			singer = CommonUtil.replacePathSpecilChar(remarks[0]);
 			int indexTitle = remarks[1].indexOf(".");
 			if(indexTitle>-1){
 				title = remarks[1].substring(0, indexTitle);
@@ -38,14 +40,15 @@ public class ApeSpider2 implements PageProcessor {
 		String language = page.getHtml().xpath("//div[@class='fl over w638']/h3[4]/text()")
 				.toString();
 		
-		page.putField("remark", remark);
-		page.putField("singer", singer);
-		page.putField("title", title);
-		page.putField("link", link);
-		page.putField("pw", pw);
-		page.putField("album", album);
-		page.putField("size", size);
-		page.putField("language", language);
+		//所有字符串过滤换行符换列符
+		page.putField("remark", CommonUtil.replaceJavaSpecilChar(remark));
+		page.putField("singer", CommonUtil.replaceJavaSpecilChar(singer));
+		page.putField("title", CommonUtil.replaceJavaSpecilChar(title));
+		page.putField("link", CommonUtil.replaceJavaSpecilChar(link));
+		page.putField("pw", CommonUtil.replaceJavaSpecilChar(pw));
+		page.putField("album", CommonUtil.replaceJavaSpecilChar(album));
+		page.putField("size", CommonUtil.replaceJavaSpecilChar(size));
+		page.putField("language", CommonUtil.replaceJavaSpecilChar(language));
 		
 		ResultItems resultItems = page.getResultItems();
 		if (resultItems.get("title") == null || resultItems.get("link") == null) {
@@ -60,7 +63,9 @@ public class ApeSpider2 implements PageProcessor {
 
 	public static void main(String[] args) {
 		System.out.println("started!");
+		H2DBServer.start();
 		Spider.create(new ApeSpider2()).addUrl("http://www.51ape.com").addPipeline(new FilePipeline()).thread(5)
 				.run();
+		H2DBServer.stop();
 	}
 }

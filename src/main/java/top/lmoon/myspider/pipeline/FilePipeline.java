@@ -57,7 +57,7 @@ public class FilePipeline implements Pipeline {
 	private static String toWriterString(String singer, String title, String link, String pw, String album, String size,
 			String language, String remark) {
 		StringBuffer sb = new StringBuffer();
-		String songId = SongIdFactory.getInstance().getSongId();
+		int songId = SongIdFactory.getInstance().getSongId();
 		int singerId = SingerIdFactory.getInstance().getSingerId(singer);
 		int songIdForSinger = SongIdFactory.getInstance().getSongIdForSinger(singerId);
 		sb.append(songId).append(SysConstants.COLUMN_SYMBOL).append(singerId).append(SysConstants.COLUMN_SYMBOL).append(songIdForSinger)

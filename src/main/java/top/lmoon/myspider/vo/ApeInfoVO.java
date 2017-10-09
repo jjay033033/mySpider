@@ -12,9 +12,9 @@ import org.apache.commons.collections.MapUtils;
  */
 public class ApeInfoVO {
 	
-	private String songId;
-	private String singerId;
-	private String songIdForSinger;
+	private int songId;
+	private int singerId;
+	private int songIdForSinger;
 	private String singer;
 	private String title;
 	private String link;
@@ -26,7 +26,7 @@ public class ApeInfoVO {
 	
 	public ApeInfoVO(){}
 	
-	public ApeInfoVO(String songId, String singerId, String songIdForSinger, String singer, String title, String link,
+	public ApeInfoVO(int songId, int singerId, int songIdForSinger, String singer, String title, String link,
 			String pw, String album, String size, String language, String remark) {
 		super();
 		this.songId = songId;
@@ -42,22 +42,22 @@ public class ApeInfoVO {
 		this.remark = remark;
 	}
 	
-	public String getSongId() {
+	public int getSongId() {
 		return songId;
 	}
-	public void setSongId(String songId) {
+	public void setSongId(int songId) {
 		this.songId = songId;
 	}
-	public String getSingerId() {
+	public int getSingerId() {
 		return singerId;
 	}
-	public void setSingerId(String singerId) {
+	public void setSingerId(int singerId) {
 		this.singerId = singerId;
 	}
-	public String getSongIdForSinger() {
+	public int getSongIdForSinger() {
 		return songIdForSinger;
 	}
-	public void setSongIdForSinger(String songIdForSinger) {
+	public void setSongIdForSinger(int songIdForSinger) {
 		this.songIdForSinger = songIdForSinger;
 	}
 	public String getRemark() {
