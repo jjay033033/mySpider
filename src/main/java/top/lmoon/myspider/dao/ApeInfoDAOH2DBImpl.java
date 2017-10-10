@@ -18,6 +18,7 @@ import top.lmoon.jdbc.JdbcTemplate;
 import top.lmoon.jdbc.ResultSetExtractor;
 import top.lmoon.jdbc.RowMapper;
 import top.lmoon.myspider.util.DbConnectionUtil;
+import top.lmoon.myspider.util.SqlUtil;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
@@ -45,11 +46,11 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 		StringBuffer sql = new StringBuffer("select * from apeinfo where 1=1 ");
 		if (StringUtils.isNotBlank(singer)) {
 			sql.append(" and singer like ? ");
-			paramsList.add(singer);
+			paramsList.add("%"+singer+"%");
 		}
 		if (StringUtils.isNotBlank(title)) {
 			sql.append(" and title like ? ");
-			paramsList.add(title);
+			paramsList.add("%"+title+"%");
 		}
 		sql.append(" limit ?,?");
 		paramsList.add((pageNo - 1) * pageSize);
@@ -90,11 +91,11 @@ public class ApeInfoDAOH2DBImpl implements ApeInfoDAO {
 		StringBuffer sql = new StringBuffer("select count(1) from apeinfo where 1=1 ");
 		if (StringUtils.isNotBlank(singer)) {
 			sql.append(" and singer like ? ");
-			paramsList.add(singer);
+			paramsList.add("%"+singer+"%");
 		}
 		if (StringUtils.isNotBlank(title)) {
 			sql.append(" and title like ? ");
-			paramsList.add(title);
+			paramsList.add("%"+title+"%");
 		}
 		return JdbcTemplate.queryForInt(DbConnectionUtil.getConnection(), sql.toString(), paramsList.toArray());
 	}

@@ -18,11 +18,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -35,6 +37,7 @@ import top.lmoon.myspider.constant.SysConstants;
 import top.lmoon.myspider.dao.ApeInfoDAO;
 import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.h2db.H2DBServer;
+import top.lmoon.myspider.service.CacheService;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
@@ -53,11 +56,22 @@ public class MainFrame extends JFrame {
 
 	private JTextArea textArea;
 
-	private JTable jTable;
+	private static JTable jTable;
 
-	private DefaultTableModel tableModel;
+	private static DefaultTableModel tableModel;
+	
+	private static JScrollPane scrollpane;
+	
+	private static JLabel totalLabel;
+	
+	private static JTextField singerTf = new JTextField();
+	private static JTextField titleTf = new JTextField();
 	
 	private static int pageNo = 1;
+	
+	private static int songsCount = 0;
+	
+	private static int pageTotal = 0;
 
 	private Desktop desktop = Desktop.getDesktop();
 
@@ -79,23 +93,23 @@ public class MainFrame extends JFrame {
 		return instance;
 	}
 
-	private void drawFrame() {
-		MainFrame mFrame = getInstance();
-		mFrame.setTitle("My songs");
-		mFrame.setIconImage(new ImageIcon("./res/img/title.png").getImage());
-		mFrame.setSize(690, 600);
-		mFrame.addWindowListener(new CloseWindowListener());
+	public void drawFrame() {
+//		MainFrame mFrame = getInstance();
+		this.setTitle("My songs");
+		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
+		this.setSize(690, 600);
+		this.addWindowListener(new CloseWindowListener());
 		;
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式
-		mFrame.setLocationRelativeTo(null);// 显示的界面居中
+		this.setLocationRelativeTo(null);// 显示的界面居中
 
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(new BorderLayout());
 		contentPanel.add(westPanel(), BorderLayout.CENTER);
 		contentPanel.add(eastPanel(), BorderLayout.EAST);
 		contentPanel.add(southPanel(), BorderLayout.SOUTH);
-		mFrame.setContentPane(contentPanel);
-		mFrame.setVisible(true);
+		this.setContentPane(contentPanel);
+		this.setVisible(true);
 	}
 
 	private class downloadAction implements ActionListener {
@@ -105,7 +119,7 @@ public class MainFrame extends JFrame {
 			try {
 				int row = jTable.getSelectedRow();
 				if (row == -1) {
-					textArea.setText("没有选中任何表!");
+					textArea.setText("请选中数据!");
 					return;
 				}
 				ApeInfoVO vo = (ApeInfoVO) tableModel.getValueAt(row, VO_COLUMN_INDEX);
@@ -116,6 +130,21 @@ public class MainFrame extends JFrame {
 				logger.error("", e1);
 			}
 
+		}
+
+	}
+	
+	private class searchAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			pageNo = 1;
+			Object[][] data = getData(pageNo);
+			if(data == null){
+				JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			setTableData(data);
 		}
 
 	}
@@ -135,7 +164,7 @@ public class MainFrame extends JFrame {
 				JOptionPane.showMessageDialog(getInstance(), "上页没有数据了哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			tableModel.setDataVector(data, COLUMN_NAME);
+			setTableData(data);
 		}
 
 	}
@@ -150,13 +179,24 @@ public class MainFrame extends JFrame {
 				JOptionPane.showMessageDialog(getInstance(), "下页没有数据了哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
-			tableModel.setDataVector(data, COLUMN_NAME);
+			setTableData(data);
 		}
 
 	}
 	
+	private static void setTableData(Object[][] data){
+		tableModel.setDataVector(data, COLUMN_NAME);
+		formatTable();
+//		scrollpane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));;
+		updateTotal();
+	}
+	
 	private static Object[][] getData(int pageNo){
-		List<ApeInfoVO> readAllFiles = dao.select(pageNo, PAGE_SIZE, null, null);
+		return getData(pageNo, singerTf.getText(), titleTf.getText());
+	}
+	
+	private static Object[][] getData(int pageNo,String singer,String title){
+		List<ApeInfoVO> readAllFiles = dao.select(pageNo, PAGE_SIZE, singer, title);
 		if(readAllFiles==null||readAllFiles.isEmpty()){
 			return null;
 		}
@@ -170,6 +210,20 @@ public class MainFrame extends JFrame {
 			data[i][VO_COLUMN_INDEX] = vo;
 		}
 		return data;
+	}
+	
+	private static void formatTable(){
+		jTable.getColumnModel().getColumn(0).setMaxWidth(40);
+		jTable.getColumnModel().getColumn(1).setMaxWidth(150);
+		jTable.getColumnModel().getColumn(3).setMaxWidth(80);
+		jTable.getColumnModel().getColumn(4).setMinWidth(0);
+		jTable.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(0);
+	}
+	
+	private static void updateTotal(){
+		songsCount = CacheService.getSearchTotal(singerTf.getText(), titleTf.getText());
+		pageTotal = (songsCount-1)/PAGE_SIZE+1;
+		totalLabel.setText(pageNo+"/"+pageTotal+"("+songsCount+")");
 	}
 
 	private JPanel westPanel() {
@@ -191,14 +245,10 @@ public class MainFrame extends JFrame {
 			}
 
 		};
-		jTable.getColumnModel().getColumn(0).setMaxWidth(40);
-		jTable.getColumnModel().getColumn(1).setMaxWidth(150);
-		jTable.getColumnModel().getColumn(3).setMaxWidth(80);
-		jTable.getColumnModel().getColumn(4).setMinWidth(0);
-		jTable.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(0);
+		formatTable();
 		ListSelectionModel selectionModel = jTable.getSelectionModel();
 		selectionModel.addListSelectionListener(listSelectionListener);
-		JScrollPane scrollpane = new JScrollPane(jTable);
+		scrollpane = new JScrollPane(jTable);
 		westPanel.add(scrollpane, BorderLayout.CENTER);
 		westPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 5));
 
@@ -241,6 +291,12 @@ public class MainFrame extends JFrame {
 	private JPanel eastPanel() {
 		JPanel eastPanel = new JPanel();
 		eastPanel.setLayout(new BorderLayout());
+		
+		JLabel singerLabel = new JLabel("歌手");
+		JLabel titleLabel = new JLabel("歌名");
+		
+		JButton searchButton = new JButton("搜索");
+		searchButton.addActionListener(new searchAction());
 
 		JButton pageUpButton = new JButton("上页");
 		pageUpButton.addActionListener(new pageUpAction());
@@ -251,11 +307,20 @@ public class MainFrame extends JFrame {
 		JButton downloadButton = new JButton("下载");
 		downloadButton.addActionListener(new downloadAction());
 		
+		totalLabel = new JLabel();
+		updateTotal();
+		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(14, 1,0,5));
+		buttonPanel.add(singerLabel);
+		buttonPanel.add(singerTf);
+		buttonPanel.add(titleLabel);
+		buttonPanel.add(titleTf);
+		buttonPanel.add(searchButton);
 		buttonPanel.add(pageUpButton);
 		buttonPanel.add(pageDownButton);
 		buttonPanel.add(downloadButton);
+		buttonPanel.add(totalLabel);
 
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
 		eastPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 10));
@@ -299,7 +364,7 @@ public class MainFrame extends JFrame {
 	 */
 	public static void main(String[] args) {
 		H2DBServer.start();
-		new MainFrame().drawFrame();
+		getInstance().drawFrame();
 	}
 
 }

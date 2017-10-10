@@ -15,7 +15,7 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("started!");
 		H2DBServer.start();
-//		dao.createTable();
+		dao.createTable();
 		int selectMaxSingerId = dao.selectMaxSingerId();
 		SingerIdFactory.setCounter(selectMaxSingerId);
 		ConcurrentHashMap<String, Integer> selectSingerIdMap = dao.selectSingerIdMap();
