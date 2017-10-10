@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -100,7 +99,6 @@ public class MainFrame extends JFrame {
 		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
 		this.setSize(690, 600);
 		this.addWindowListener(new CloseWindowListener());
-		;
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式
 		this.setLocationRelativeTo(null);// 显示的界面居中
 
