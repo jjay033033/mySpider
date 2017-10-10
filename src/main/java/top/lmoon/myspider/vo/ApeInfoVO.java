@@ -12,9 +12,9 @@ import org.apache.commons.collections.MapUtils;
  */
 public class ApeInfoVO {
 	
-	private String songId;
-	private String singerId;
-	private String songIdForSinger;
+	private int songId;
+	private int singerId;
+	private int songIdForSinger;
 	private String singer;
 	private String title;
 	private String link;
@@ -23,11 +23,12 @@ public class ApeInfoVO {
 	private String size;
 	private String language;
 	private String remark;	
+	private String url;
 	
 	public ApeInfoVO(){}
 	
-	public ApeInfoVO(String songId, String singerId, String songIdForSinger, String singer, String title, String link,
-			String pw, String album, String size, String language, String remark) {
+	public ApeInfoVO(int songId, int singerId, int songIdForSinger, String singer, String title, String link,
+			String pw, String album, String size, String language, String remark,String url) {
 		super();
 		this.songId = songId;
 		this.singerId = singerId;
@@ -40,24 +41,25 @@ public class ApeInfoVO {
 		this.size = size;
 		this.language = language;
 		this.remark = remark;
+		this.url = url;
 	}
 	
-	public String getSongId() {
+	public int getSongId() {
 		return songId;
 	}
-	public void setSongId(String songId) {
+	public void setSongId(int songId) {
 		this.songId = songId;
 	}
-	public String getSingerId() {
+	public int getSingerId() {
 		return singerId;
 	}
-	public void setSingerId(String singerId) {
+	public void setSingerId(int singerId) {
 		this.singerId = singerId;
 	}
-	public String getSongIdForSinger() {
+	public int getSongIdForSinger() {
 		return songIdForSinger;
 	}
-	public void setSongIdForSinger(String songIdForSinger) {
+	public void setSongIdForSinger(int songIdForSinger) {
 		this.songIdForSinger = songIdForSinger;
 	}
 	public String getRemark() {
@@ -109,11 +111,19 @@ public class ApeInfoVO {
 		this.language = language;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	@Override
 	public String toString() {
 		return "ApeInfoVO [songId=" + songId + ", singerId=" + singerId + ", songIdForSinger=" + songIdForSinger
 				+ ", singer=" + singer + ", title=" + title + ", link=" + link + ", pw=" + pw + ", album=" + album
-				+ ", size=" + size + ", language=" + language + ", remark=" + remark + "]";
+				+ ", size=" + size + ", language=" + language + ", remark=" + remark + ", url=" + url + "]";
 	}
 
 }

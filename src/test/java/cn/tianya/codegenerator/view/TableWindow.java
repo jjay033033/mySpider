@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -29,9 +28,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,12 +45,6 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
-
-import cn.tianya.codegenerator.BeanInfo;
-import cn.tianya.codegenerator.db.DbTableVOCodeGenerator;
-import cn.tianya.codegenerator.util.DbUtil;
-import cn.tianya.codegenerator.util.JavaFileUtils;
 
 /**
  * @author PTY
@@ -294,8 +285,9 @@ public class TableWindow {
 				centerPanel.setLayout(new BorderLayout());
 				Properties props = getProperties();
 				Connection conn = ConnectionUtils.getConnection(props);
-				List<String> tables = DbUtil.getTables(conn,
-						props.getProperty("user"), props.getProperty("dbName"));
+				List<String> tables = null;
+//				List<String> tables = DbUtil.getTables(conn,
+//						props.getProperty("user"), props.getProperty("dbName"));
 				Object[][] data = new Object[tables.size()][2];
 				System.out.println(tables);
 				for (int i = 0; i < tables.size(); i++) {
@@ -380,12 +372,12 @@ public class TableWindow {
 				System.out.println(list);
 				Connection conn = ConnectionUtils
 						.getConnection(getProperties());
-				DbTableVOCodeGenerator codeGenerator = new DbTableVOCodeGenerator(
-						conn);
-				String[] a = new String[]{};
-				BeanInfo[] beanInfos = codeGenerator.generate(
-						"vo1", list.toArray(a));
-				JavaFileUtils.createJavaFile(null, beanInfos);
+//				DbTableVOCodeGenerator codeGenerator = new DbTableVOCodeGenerator(
+//						conn);
+//				String[] a = new String[]{};
+//				BeanInfo[] beanInfos = codeGenerator.generate(
+//						"vo1", list.toArray(a));
+//				JavaFileUtils.createJavaFile(null, beanInfos);
 				textArea.append("生成VO"+list+"完毕!\n");
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block

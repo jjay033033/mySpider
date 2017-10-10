@@ -39,12 +39,13 @@ public class FilePipeline implements Pipeline {
 		String album = MapUtils.getString(map, "album", "");
 		String size = MapUtils.getString(map, "size", "");
 		String language = MapUtils.getString(map, "language", "");
+		String url = MapUtils.getString(map, "url", "");
 		if (StringUtils.isBlank(singer.trim())) {
 			singer = "其他";
 		}
 		File file = FileLock.getFile(singer);
 		synchronized (file) {
-			String data = toWriterString(singer, title, link, pw, album, size, language, remark);
+			String data = toWriterString(singer, title, link, pw, album, size, language, remark,url);
 			try {
 				FileUtils.write(file, data, SysConstants.ENCODING_CHARSET, true);
 			} catch (IOException e) {
@@ -55,16 +56,16 @@ public class FilePipeline implements Pipeline {
 	}
 
 	private static String toWriterString(String singer, String title, String link, String pw, String album, String size,
-			String language, String remark) {
+			String language, String remark,String url) {
 		StringBuffer sb = new StringBuffer();
-		String songId = SongIdFactory.getInstance().getSongId();
+		int songId = SongIdFactory.getInstance().getSongId();
 		int singerId = SingerIdFactory.getInstance().getSingerId(singer);
 		int songIdForSinger = SongIdFactory.getInstance().getSongIdForSinger(singerId);
 		sb.append(songId).append(SysConstants.COLUMN_SYMBOL).append(singerId).append(SysConstants.COLUMN_SYMBOL).append(songIdForSinger)
 				.append(SysConstants.COLUMN_SYMBOL).append(singer).append(SysConstants.COLUMN_SYMBOL).append(title).append(SysConstants.COLUMN_SYMBOL)
 				.append(link).append(SysConstants.COLUMN_SYMBOL).append(pw).append(SysConstants.COLUMN_SYMBOL).append(album).append(SysConstants.COLUMN_SYMBOL)
 				.append(size).append(SysConstants.COLUMN_SYMBOL).append(language).append(SysConstants.COLUMN_SYMBOL).append(remark)
-				.append(SysConstants.LINE_SYMBOL);
+				.append(SysConstants.COLUMN_SYMBOL).append(url).append(SysConstants.LINE_SYMBOL);
 		return sb.toString();
 	}
 
