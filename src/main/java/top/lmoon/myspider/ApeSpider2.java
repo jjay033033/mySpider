@@ -69,9 +69,9 @@ public class ApeSpider2 implements PageProcessor {
 		.setScheduler(new FileCacheQueueScheduler(CURSOR_FILE_PATH)).thread(5).run();
 	}
 
-	public static void main(String[] args) {
-		System.out.println("started!");
-		Spider.create(new ApeSpider2()).addUrl("http://www.51ape.com").addPipeline(new FilePipeline())
-				.setScheduler(new FileCacheQueueScheduler(CURSOR_FILE_PATH)).thread(5).run();
-	}
+//	public static void main(String[] args) {
+//		System.out.println("started!");
+//		Spider.create(new ApeSpider2()).addUrl("http://www.51ape.com").addPipeline(new FilePipeline())
+//				.setScheduler(new FileCacheQueueScheduler(CURSOR_FILE_PATH)).thread(5).run();
+//	}
 }

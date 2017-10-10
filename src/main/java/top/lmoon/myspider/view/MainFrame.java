@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -187,6 +188,7 @@ public class MainFrame extends JFrame {
 	private static void setTableData(Object[][] data){
 		tableModel.setDataVector(data, COLUMN_NAME);
 		formatTable();
+		jTable.scrollRectToVisible(jTable.getCellRect(0, 0, true));
 //		scrollpane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));;
 		updateTotal();
 	}
@@ -263,7 +265,8 @@ public class MainFrame extends JFrame {
 				// int row = e.getLastIndex();
 				int row = jTable.getSelectedRow();
 				if (row == -1) {
-					textArea.setText("没有选中任何表!");
+//					textArea.setText("请选中数据!");
+					textArea.setText("");
 					return;
 				}
 				// .getValueAt(row, 3)
@@ -317,9 +320,16 @@ public class MainFrame extends JFrame {
 		buttonPanel.add(titleLabel);
 		buttonPanel.add(titleTf);
 		buttonPanel.add(searchButton);
-		buttonPanel.add(pageUpButton);
-		buttonPanel.add(pageDownButton);
 		buttonPanel.add(downloadButton);
+		
+		buttonPanel.add(new JPanel());
+		buttonPanel.add(new JPanel());
+		buttonPanel.add(new JPanel());
+		buttonPanel.add(new JPanel());
+		buttonPanel.add(new JPanel());
+		
+		buttonPanel.add(pageUpButton);
+		buttonPanel.add(pageDownButton);		
 		buttonPanel.add(totalLabel);
 
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
