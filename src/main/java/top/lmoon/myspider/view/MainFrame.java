@@ -79,7 +79,7 @@ public class MainFrame extends JFrame {
 	
 	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小", "" };
 	
-	private static final int PAGE_SIZE = 50;
+	private static final int PAGE_SIZE = 20;
 	
 	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
 	
@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 //		MainFrame mFrame = getInstance();
 		this.setTitle("My songs");
 		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
-		this.setSize(690, 600);
+		this.setSize(690, 567);
 		this.addWindowListener(new CloseWindowListener());
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式
 		this.setLocationRelativeTo(null);// 显示的界面居中
@@ -292,9 +292,10 @@ public class MainFrame extends JFrame {
 	private JPanel eastPanel() {
 		JPanel eastPanel = new JPanel();
 		eastPanel.setLayout(new BorderLayout());
+		eastPanel.setPreferredSize(new Dimension(100, 200));
 		
-		JLabel singerLabel = new JLabel("歌手");
-		JLabel titleLabel = new JLabel("歌名");
+		JLabel singerLabel = new JLabel("歌手:");
+		JLabel titleLabel = new JLabel("歌名:");
 		
 		JButton searchButton = new JButton("搜索");
 		searchButton.addActionListener(new searchAction());
