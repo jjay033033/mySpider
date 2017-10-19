@@ -7,6 +7,10 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -30,6 +34,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +79,8 @@ public class MainFrame extends JFrame {
 	private static int pageTotal = 0;
 
 	private Desktop desktop = Desktop.getDesktop();
+	
+	private static Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
 	private static final int VO_COLUMN_INDEX = 4;
 	
@@ -122,6 +129,9 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				ApeInfoVO vo = (ApeInfoVO) tableModel.getValueAt(row, VO_COLUMN_INDEX);
+				if(StringUtils.isNotBlank(vo.getPw())){
+					setSysClipboardText(vo.getPw());
+				}
 				desktop.browse(new URI(vo.getLink()));
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
@@ -367,6 +377,15 @@ public class MainFrame extends JFrame {
 			System.exit(0);
 		}
 	}
+	
+	/** 
+     * 将字符串复制到剪切板。 
+     */  
+    private static void setSysClipboardText(String writeMe) {  
+		Clipboard clip = defaultToolkit.getSystemClipboard();  
+        Transferable tText = new StringSelection(writeMe);  
+        clip.setContents(tText, null);  
+    }  
 
 	/**
 	 * @param args
