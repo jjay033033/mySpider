@@ -1,7 +1,7 @@
 /**
  * 
  */
-package baidu;
+package top.lmoon.myspider.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,6 +25,10 @@ public class HttpUtil {
 	 * logger
 	 */
 	private static Logger logger = Logger.getLogger(HttpUtil.class);
+	
+	private static final int connectTimeout = 5000;
+	private static final int readTimeout = 5000;
+	private static final String charset = "UTF-8";
 	
 	/**
 	 * 支持的Http method
@@ -177,7 +181,7 @@ public class HttpUtil {
 	 * @return
 	 */
 	public static String get(String url, Map params, int connectTimeout, int readTimeout, String charset){
-		return invokeUrl(url,params,null,null,connectTimeout,readTimeout,charset,HttpMethod.GET);
+		return get(url,params,null,connectTimeout,readTimeout,charset);
 	}
 	
 	/**
@@ -192,6 +196,10 @@ public class HttpUtil {
 	 */
 	public static String get(String url, Map params, Map<String,String> headers,int connectTimeout, int readTimeout, String charset){
 		return invokeUrl(url,params,null,headers,connectTimeout,readTimeout,charset,HttpMethod.GET);
+	}
+	
+	public static String get(String url){
+		return get(url, null, connectTimeout, readTimeout, charset);
 	}
 	
 	/**
