@@ -110,7 +110,7 @@ public class BaiduNetDiskUtil {
 		JSONObject json_data = new JSONObject(postResult);
 		int resultInt = json_data.getInt("errno");
 		if (resultInt==0) {
-			JSONArray jsonArray2 = new JSONArray(json_data.getString("list"));
+			JSONArray jsonArray2 = json_data.getJSONArray("list");
 			json_data = jsonArray2.getJSONObject(0);
 			// 储存文件下载实链
 			return json_data.getString("dlink");

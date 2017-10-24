@@ -5,11 +5,16 @@ package top.lmoon.myspider.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Map;
 import java.util.Set;
 
@@ -286,6 +291,44 @@ public class HttpUtil {
 	public static String head(String url, Map params, Map<String,String> headers, int connectTimeout, int readTimeout, String charset){
 		return invokeUrl(url,params,null,headers,connectTimeout,readTimeout,charset,HttpMethod.HEAD);
 	}
+	
+	public static boolean download(String urlStr,String fileName){
+        // 下载网络文件
+        int bytesum = 0;
+        int byteread = 0;       
+        InputStream inStream = null;
+        FileOutputStream fs = null;
+        try {
+        	URL url = new URL(urlStr);
+            URLConnection conn = url.openConnection();
+            inStream = conn.getInputStream();
+            fs = new FileOutputStream(fileName);
+            byte[] buffer = new byte[1204];
+            while ((byteread = inStream.read(buffer)) != -1) {
+                bytesum += byteread;
+                System.out.println(bytesum);
+                fs.write(buffer, 0, byteread);
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+        	try {
+				if(fs!=null){
+					fs.close();
+				}
+				if(inStream!=null){
+					inStream.close();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        return false;
+    }
 
 }
 
