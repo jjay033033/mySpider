@@ -17,8 +17,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+
+import top.lmoon.myspider.constant.SysConstants;
+import top.lmoon.myspider.service.ThreadPool;
 
 /**
  * 提供通过HTTP协议获取内容的方法 <br/>
@@ -328,10 +334,9 @@ public class HttpUtil {
             }
             System.out.println(bytesum);
             return true;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("",e);
         }finally{
         	try {
 				if(fs!=null){

@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.URI;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -39,13 +38,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.lmoon.myspider.constant.SysConstants;
+import top.lmoon.myspider.dao.ApeFileDAO;
+import top.lmoon.myspider.dao.ApeFileDAOH2DBImpl;
 import top.lmoon.myspider.dao.ApeInfoDAO;
 import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.h2db.H2DBServer;
+import top.lmoon.myspider.service.BaiduCloudService;
 import top.lmoon.myspider.service.CacheService;
-import top.lmoon.myspider.util.BaiduCloudUtil;
-import top.lmoon.myspider.util.BaiduCloudUtil.BaiduCloudInfo;
-import top.lmoon.myspider.util.HttpUtil;
+import top.lmoon.myspider.service.DownloadService;
+import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
+import top.lmoon.myspider.util.DownloadUtil.downloadType;
+import top.lmoon.myspider.vo.ApeFileVO;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
@@ -93,6 +96,8 @@ public class MainFrame extends JFrame {
 
 	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
 
+	private static ApeFileDAO fileDao = new ApeFileDAOH2DBImpl();
+
 	private static MainFrame instance = new MainFrame();
 
 	private MainFrame() {
@@ -132,14 +137,37 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				ApeInfoVO vo = (ApeInfoVO) tableModel.getValueAt(row, VO_COLUMN_INDEX);
+				ApeFileVO fileVo = fileDao.select(vo.getSongId());
+				if (fileVo != null) {
+					if(fileVo.getDownType() == downloadType.FINISHED){
+						JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+						return;
+//					}else if(fileVo.getDownType() == downloadType.ONGOING){
+//						JOptionPane.showMessageDialog(getInstance(), "正在下载中哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+//						return;
+					}
+					
+				}else{
+					fileVo = new ApeFileVO();
+					long currentTimeMillis = System.currentTimeMillis();
+					fileVo.setCreateTime(currentTimeMillis);
+					fileVo.setDownType(downloadType.NOTSTART);
+					fileVo.setSize(vo.getSize());
+					fileVo.setSongId(vo.getSongId());
+					fileVo.setTitle(vo.getTitle());
+					fileVo.setName("");
+					fileVo.setUpdateTime(currentTimeMillis);
+					fileDao.insert(fileVo);
+				}				
+				
 				if (StringUtils.isNotBlank(vo.getPw())) {
 					setSysClipboardText(vo.getPw());
 				}
 				// desktop.browse(new URI(vo.getLink()));
-				BaiduCloudInfo fileUrlInfo = BaiduCloudUtil.downloadAndGetFile(vo.getLink());
-				if(!fileUrlInfo.getHasDownload()){
-					DownloadFrame downloadFrame = new DownloadFrame(getInstance(), fileUrlInfo);
-				}				
+				BaiduCloudInfo fileUrlInfo = BaiduCloudService.downloadAndGetFile(vo.getLink(), vo);
+				if (fileUrlInfo.getHasDownload() == downloadType.NOTSTART) {
+					DownloadFrame downloadFrame = new DownloadFrame(getInstance(), fileUrlInfo, vo);
+				}
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -380,6 +408,14 @@ public class MainFrame extends JFrame {
 
 	private static class CloseWindowListener extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
+			int downloadThreadCounter = DownloadService.getDownloadThreadCounter();
+			if(downloadThreadCounter>0){
+//				JOptionPane.showMessageDialog(getInstance(), "还有"+downloadThreadCounter+"个任务正在下载哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+				int showConfirmDialog = JOptionPane.showConfirmDialog(getInstance(), "还有"+downloadThreadCounter+"个任务正在下载哦，确定关闭吗？", "提示", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+				if(showConfirmDialog==JOptionPane.NO_OPTION){
+					return;
+				}
+			}
 			H2DBServer.stop();
 			System.exit(0);
 		}

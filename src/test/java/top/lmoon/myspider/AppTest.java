@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import top.lmoon.myspider.apefile.FileReader;
+import top.lmoon.myspider.dao.ApeFileDAOH2DBImpl;
 import top.lmoon.myspider.dao.ApeInfoDAO;
 import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.h2db.H2DBServer;
@@ -19,11 +20,17 @@ public class AppTest {
 	
 	private static ApeInfoDAOH2DBImpl dao = new ApeInfoDAOH2DBImpl();
 	
+	private static ApeFileDAOH2DBImpl fileDao = new ApeFileDAOH2DBImpl();
+	
 	private static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 	
 	public static void main(String[] args) {
 		H2DBServer.start();
-		select();
+//		select();
+		int dropTable = fileDao.dropTable();
+		int createTable = fileDao.createTable();
+		System.out.println(dropTable);
+		System.out.println(createTable);
 		H2DBServer.stop();
 //		createdb();
 	}

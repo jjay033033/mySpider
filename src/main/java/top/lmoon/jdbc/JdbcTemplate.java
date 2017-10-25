@@ -233,8 +233,10 @@ public class JdbcTemplate {
 
 			// 处理ResultSet结果
 			rs = ps.executeQuery();
-
-			return rse.extract(rs);
+			if (rs.next()) {
+				return rse.extract(rs);
+			}
+			return null;
 
 		} catch (Exception e) {
 			throw new RuntimeException("JdbcTemplate执行查询失败！", e);

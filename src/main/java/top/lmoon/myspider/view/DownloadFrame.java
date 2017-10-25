@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,8 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import top.lmoon.myspider.util.BaiduCloudUtil;
-import top.lmoon.myspider.util.BaiduCloudUtil.BaiduCloudInfo;
+import top.lmoon.myspider.service.BaiduCloudService;
+import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
+import top.lmoon.myspider.util.DownloadUtil.downloadType;
+import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
  * @author LMoon
@@ -37,34 +40,35 @@ public class DownloadFrame extends JFrame {
 	
 	private JTextField text;
 
-	public DownloadFrame(Component c, BaiduCloudInfo info) {
+	public DownloadFrame(Component c, BaiduCloudInfo info,ApeInfoVO infoVo) {
 		if (StringUtils.isBlank(info.getVcodeUrl())) {
 			return;
 		}
 		this.setTitle("VCode input");
 		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
-		this.setSize(200, 100);
+		this.setSize(250, 150);
 		// this.addWindowListener(new CloseWindowListener());
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式
 		// this.setLocationRelativeTo(null);// 显示的界面居中
 		this.setLocationRelativeTo(c);
 
 		JPanel contentPanel = new JPanel();
-		contentPanel.setLayout(new GridLayout(2, 2));
+		contentPanel.setLayout(new GridLayout(2, 2, 10, 10));
+		contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		// contentPanel.setPreferredSize(new Dimension(100, 200));
 
+		text = new JTextField();
+		
 		JLabel vcodePic = new JLabel();
 		if(!setVCodePic(vcodePic, info.getVcodeUrl(),text)){
 			return;
 		}
 
 		JButton changeButton = new JButton("换个");
-		changeButton.addActionListener(new changeAction(vcodePic, info.getVcodeUrl(),text));
-
-		text = new JTextField();
+		changeButton.addActionListener(new changeAction(vcodePic, info.getVcodeUrl(),text));	
 
 		JButton checkButton = new JButton("验证");
-		checkButton.addActionListener(new checkAction(this,info,vcodePic, info.getVcodeUrl(),text));
+		checkButton.addActionListener(new checkAction(this,info,vcodePic, info.getVcodeUrl(),text,infoVo));
 
 		contentPanel.add(vcodePic);
 		contentPanel.add(changeButton);
@@ -73,7 +77,7 @@ public class DownloadFrame extends JFrame {
 		
 		this.setContentPane(contentPanel);
 		this.setVisible(true);
-
+		
 	}
 
 	/**
@@ -136,15 +140,18 @@ public class DownloadFrame extends JFrame {
 		private String picUrl;
 		private JTextField text;
 		
+		private ApeInfoVO infoVo;
+		
 		/**
 		 * 
 		 */
-		public checkAction(DownloadFrame frame,BaiduCloudInfo info,JLabel vcodePic, String picUrl,JTextField text) {
+		public checkAction(DownloadFrame frame,BaiduCloudInfo info,JLabel vcodePic, String picUrl,JTextField text,ApeInfoVO infoVo) {
 			this.frame = frame;
 			this.info = info;
 			this.vcodePic = vcodePic;
 			this.picUrl = picUrl;
 			this.text = text;
+			this.infoVo = infoVo;
 		}
 
 		/*
@@ -157,8 +164,8 @@ public class DownloadFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			String vcode = text.getText();
 			info.setVcodeInput(vcode);
-			BaiduCloudInfo fileUrlInfo = BaiduCloudUtil.download(info.getBdstoken(), info.getAppId(), info.getParams(), info.getFormParams());
-			if(fileUrlInfo.getHasDownload()){
+			BaiduCloudInfo fileUrlInfo = BaiduCloudService.download(infoVo,info.getBdstoken(), info.getAppId(), info.getParams(), info.getFormParams());
+			if(fileUrlInfo.getHasDownload()==downloadType.ONGOING){
 				frame.setVisible(false);
 			}else{
 				setVCodePic(vcodePic, picUrl, text);
