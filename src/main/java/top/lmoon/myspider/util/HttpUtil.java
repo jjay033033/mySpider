@@ -324,9 +324,9 @@ public class HttpUtil {
             byte[] buffer = new byte[1024];
             while ((byteread = inStream.read(buffer)) != -1) {
                 bytesum += byteread;
-                System.out.println(bytesum);
                 fs.write(buffer, 0, byteread);
             }
+            System.out.println(bytesum);
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
