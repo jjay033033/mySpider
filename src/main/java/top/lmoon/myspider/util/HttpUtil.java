@@ -161,6 +161,10 @@ public class HttpUtil {
 		return invokeUrl(url,params,formParams,null,connectTimeout,readTimeout,charset,HttpMethod.POST);
 	}
 	
+	public static String post(String url, Map params,Map formParams){
+		return post(url,params,formParams,connectTimeout,readTimeout,charset);
+	}
+	
 	/**
 	 * POST方法提交Http请求，语义为“增加” <br/>
 	 * 注意：Http方法中只有POST方法才能使用body来提交内容
@@ -293,6 +297,8 @@ public class HttpUtil {
 	}
 	
 	public static boolean download(String urlStr,String fileName){
+		System.out.println(urlStr);
+		System.out.println(fileName);
         // 下载网络文件
         int bytesum = 0;
         int byteread = 0;       
@@ -301,9 +307,21 @@ public class HttpUtil {
         try {
         	URL url = new URL(urlStr);
             URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+//            conn.setRequestProperty("Cookie",
+//					"bdshare_firstime=1430100467345; yundetect_httpport=10000; PANWEB=1; BAIDUID=0E5FA8063809E5A490BE361C4478E8AC:FG=1; BIDUPSID=0E5FA8063809E5A490BE361C4478E8AC; PSTM=1504521830; MCITY=-%3A; BDUSS=d3elRTdHlSUGc4LXlGR2VXWk9zNlUyQjlUcGN-eTFXMi1ua3A0OWRrSWItdkpaTVFBQUFBJCQAAAAAAAAAAAEAAACwn7oKampheTAzMzAzMwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtty1kbbctZbz; STOKEN=e66b0ebd517cc632976a6a405289803dd988b171fe127d9add7ed3467386ffe8; SCRC=0bd4d4126f875e2ae446a664d2083cd7; BDCLND=d7az66%2BRO8YzNC0nbnAw2Nx3DRo0gQPD; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685,1507625751,1507886431,1507887009; BDRCVFR[mkUqnUt8juD]=mk3SLVN4HKm; PSINO=7; H_PS_PSSID=1438_21091");
+//			conn.setRequestProperty("Accept",
+//					"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+//			conn.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+//			conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+//			conn.setRequestProperty("Connection", "keep-alive");
+//			conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
+//            
+//            conn.setConnectTimeout(100000);
+//            conn.setReadTimeout(100000);
             inStream = conn.getInputStream();
             fs = new FileOutputStream(fileName);
-            byte[] buffer = new byte[1204];
+            byte[] buffer = new byte[1024];
             while ((byteread = inStream.read(buffer)) != -1) {
                 bytesum += byteread;
                 System.out.println(bytesum);
@@ -329,6 +347,11 @@ public class HttpUtil {
         }
         return false;
     }
+	
+	public static void main(String[] args) {
+//		download("https://pan.baidu.com/genimage?33324238656332346361663334656637323237633636373637643239666664336662343330393135363338303030303030303030303030303031353038393132353335E409471BF6D09C6E8853D11AFC018DC8", "./res/music/a.png");
+		download("https://d.pcs.baidu.com/file/5c4ec96e0602ad9d4f5fe775e8f6ed89?fid=660976564-250528-677635646695251&time=1508925401&rt=sh&sign=FDTAERV-DCb740ccc5511e5e8fedcff06b081203-nS6u7fjgOaiontHvrQFmmx%2FUWKM%3D&expires=8h&chkv=1&chkbd=0&chkpc=&dp-logid=6905609891134183393&dp-callid=0&r=588511371", "./res/music/张赫宣-会哭的人不一定流泪2.flac");
+	}
 
 }
 

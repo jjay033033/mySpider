@@ -43,6 +43,9 @@ import top.lmoon.myspider.dao.ApeInfoDAO;
 import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.h2db.H2DBServer;
 import top.lmoon.myspider.service.CacheService;
+import top.lmoon.myspider.util.BaiduCloudUtil;
+import top.lmoon.myspider.util.BaiduCloudUtil.BaiduCloudInfo;
+import top.lmoon.myspider.util.HttpUtil;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
@@ -64,44 +67,44 @@ public class MainFrame extends JFrame {
 	private static JTable jTable;
 
 	private static DefaultTableModel tableModel;
-	
+
 	private static JScrollPane scrollpane;
-	
+
 	private static JLabel totalLabel;
-	
+
 	private static JTextField singerTf = new JTextField();
 	private static JTextField titleTf = new JTextField();
-	
+
 	private static int pageNo = 1;
-	
+
 	private static int songsCount = 0;
-	
+
 	private static int pageTotal = 0;
 
 	private Desktop desktop = Desktop.getDesktop();
-	
+
 	private static Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
 	private static final int VO_COLUMN_INDEX = 4;
-	
+
 	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小", "" };
-	
+
 	private static final int PAGE_SIZE = 20;
-	
+
 	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
-	
+
 	private static MainFrame instance = new MainFrame();
-	
-	private MainFrame(){
-		
+
+	private MainFrame() {
+
 	}
-	
-	public static MainFrame getInstance(){
+
+	public static MainFrame getInstance() {
 		return instance;
 	}
 
 	public void drawFrame() {
-//		MainFrame mFrame = getInstance();
+		// MainFrame mFrame = getInstance();
 		this.setTitle("My songs");
 		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
 		this.setSize(690, 567);
@@ -129,10 +132,14 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				ApeInfoVO vo = (ApeInfoVO) tableModel.getValueAt(row, VO_COLUMN_INDEX);
-				if(StringUtils.isNotBlank(vo.getPw())){
+				if (StringUtils.isNotBlank(vo.getPw())) {
 					setSysClipboardText(vo.getPw());
 				}
-				desktop.browse(new URI(vo.getLink()));
+				// desktop.browse(new URI(vo.getLink()));
+				BaiduCloudInfo fileUrlInfo = BaiduCloudUtil.downloadAndGetFile(vo.getLink());
+				if(!fileUrlInfo.getHasDownload()){
+					DownloadFrame downloadFrame = new DownloadFrame(getInstance(), fileUrlInfo);
+				}				
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -142,72 +149,72 @@ public class MainFrame extends JFrame {
 		}
 
 	}
-	
+
 	private class searchAction implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			pageNo = 1;
 			Object[][] data = getData(pageNo);
-			if(data == null){
-				JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+			if (data == null) {
+				JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			setTableData(data);
 		}
 
 	}
-	
+
 	private class pageUpAction implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(--pageNo<1){
+			if (--pageNo < 1) {
 				pageNo++;
-				JOptionPane.showMessageDialog(getInstance(), "上页没有数据了哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(getInstance(), "上页没有数据了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			Object[][] data = getData(pageNo);
-			if(data == null){
+			if (data == null) {
 				pageNo++;
-				JOptionPane.showMessageDialog(getInstance(), "上页没有数据了哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(getInstance(), "上页没有数据了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			setTableData(data);
 		}
 
 	}
-	
+
 	private class pageDownAction implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Object[][] data = getData(++pageNo);
-			if(data == null){
+			if (data == null) {
 				pageNo--;
-				JOptionPane.showMessageDialog(getInstance(), "下页没有数据了哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(getInstance(), "下页没有数据了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 				return;
 			}
 			setTableData(data);
 		}
 
 	}
-	
-	private static void setTableData(Object[][] data){
+
+	private static void setTableData(Object[][] data) {
 		tableModel.setDataVector(data, COLUMN_NAME);
 		formatTable();
 		jTable.scrollRectToVisible(jTable.getCellRect(0, 0, true));
-//		scrollpane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));;
+		// scrollpane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));;
 		updateTotal();
 	}
-	
-	private static Object[][] getData(int pageNo){
+
+	private static Object[][] getData(int pageNo) {
 		return getData(pageNo, singerTf.getText(), titleTf.getText());
 	}
-	
-	private static Object[][] getData(int pageNo,String singer,String title){
+
+	private static Object[][] getData(int pageNo, String singer, String title) {
 		List<ApeInfoVO> readAllFiles = dao.select(pageNo, PAGE_SIZE, singer, title);
-		if(readAllFiles==null||readAllFiles.isEmpty()){
+		if (readAllFiles == null || readAllFiles.isEmpty()) {
 			return null;
 		}
 		Object[][] data = new Object[readAllFiles.size()][VO_COLUMN_INDEX + 1];
@@ -221,19 +228,19 @@ public class MainFrame extends JFrame {
 		}
 		return data;
 	}
-	
-	private static void formatTable(){
+
+	private static void formatTable() {
 		jTable.getColumnModel().getColumn(0).setMaxWidth(40);
 		jTable.getColumnModel().getColumn(1).setMaxWidth(150);
 		jTable.getColumnModel().getColumn(3).setMaxWidth(80);
 		jTable.getColumnModel().getColumn(4).setMinWidth(0);
 		jTable.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(0);
 	}
-	
-	private static void updateTotal(){
+
+	private static void updateTotal() {
 		songsCount = CacheService.getSearchTotal(singerTf.getText(), titleTf.getText());
-		pageTotal = (songsCount-1)/PAGE_SIZE+1;
-		totalLabel.setText(pageNo+"/"+pageTotal+"("+songsCount+")");
+		pageTotal = (songsCount - 1) / PAGE_SIZE + 1;
+		totalLabel.setText(pageNo + "/" + pageTotal + "(" + songsCount + ")");
 	}
 
 	private JPanel westPanel() {
@@ -241,10 +248,10 @@ public class MainFrame extends JFrame {
 		westPanel.setLayout(new BorderLayout());
 		// List<ApeInfoVO> readAllFiles = FileReader.readAllFiles();
 		Object[][] data = getData(1);
-		if(data == null){
-			JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示",JOptionPane.INFORMATION_MESSAGE);
+		if (data == null) {
+			JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 		}
-		tableModel = new DefaultTableModel(data,COLUMN_NAME );
+		tableModel = new DefaultTableModel(data, COLUMN_NAME);
 		jTable = new JTable(tableModel) {
 			private static final long serialVersionUID = 1L;
 
@@ -273,7 +280,7 @@ public class MainFrame extends JFrame {
 				// int row = e.getLastIndex();
 				int row = jTable.getSelectedRow();
 				if (row == -1) {
-//					textArea.setText("请选中数据!");
+					// textArea.setText("请选中数据!");
 					textArea.setText("");
 					return;
 				}
@@ -303,42 +310,42 @@ public class MainFrame extends JFrame {
 		JPanel eastPanel = new JPanel();
 		eastPanel.setLayout(new BorderLayout());
 		eastPanel.setPreferredSize(new Dimension(100, 200));
-		
+
 		JLabel singerLabel = new JLabel("歌手:");
 		JLabel titleLabel = new JLabel("歌名:");
-		
+
 		JButton searchButton = new JButton("搜索");
 		searchButton.addActionListener(new searchAction());
 
 		JButton pageUpButton = new JButton("上页");
 		pageUpButton.addActionListener(new pageUpAction());
-		
+
 		JButton pageDownButton = new JButton("下页");
 		pageDownButton.addActionListener(new pageDownAction());
-		
+
 		JButton downloadButton = new JButton("下载");
 		downloadButton.addActionListener(new downloadAction());
-		
+
 		totalLabel = new JLabel();
 		updateTotal();
-		
+
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(14, 1,0,5));
+		buttonPanel.setLayout(new GridLayout(14, 1, 0, 5));
 		buttonPanel.add(singerLabel);
 		buttonPanel.add(singerTf);
 		buttonPanel.add(titleLabel);
 		buttonPanel.add(titleTf);
 		buttonPanel.add(searchButton);
 		buttonPanel.add(downloadButton);
-		
+
 		buttonPanel.add(new JPanel());
 		buttonPanel.add(new JPanel());
 		buttonPanel.add(new JPanel());
 		buttonPanel.add(new JPanel());
 		buttonPanel.add(new JPanel());
-		
+
 		buttonPanel.add(pageUpButton);
-		buttonPanel.add(pageDownButton);		
+		buttonPanel.add(pageDownButton);
 		buttonPanel.add(totalLabel);
 
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
@@ -377,15 +384,15 @@ public class MainFrame extends JFrame {
 			System.exit(0);
 		}
 	}
-	
-	/** 
-     * 将字符串复制到剪切板。 
-     */  
-    private static void setSysClipboardText(String writeMe) {  
-		Clipboard clip = defaultToolkit.getSystemClipboard();  
-        Transferable tText = new StringSelection(writeMe);  
-        clip.setContents(tText, null);  
-    }  
+
+	/**
+	 * 将字符串复制到剪切板。
+	 */
+	private static void setSysClipboardText(String writeMe) {
+		Clipboard clip = defaultToolkit.getSystemClipboard();
+		Transferable tText = new StringSelection(writeMe);
+		clip.setContents(tText, null);
+	}
 
 	/**
 	 * @param args

@@ -18,5 +18,7 @@ public class SysConstants {
 	public static final String COLUMN_SYMBOL = "\t";
 
 	public static final String LINE_SYMBOL = "\n";
+	
+	public static final String FILE_PATH = "./res/music/";
 
 }
