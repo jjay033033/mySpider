@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import top.lmoon.myspider.service.BaiduCloudService;
 import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
+import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudVcode;
 import top.lmoon.myspider.util.DownloadUtil.downloadType;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
@@ -39,11 +40,19 @@ public class DownloadFrame extends JFrame {
 	private static final Logger logger = LoggerFactory.getLogger(DownloadFrame.class);
 	
 	private JTextField text;
+	
+	private JLabel vcodePic;
+	
+	private BaiduCloudInfo baiduCloudInfo;
+	
+	private ApeInfoVO apeInfoVO;
 
-	public DownloadFrame(Component c, BaiduCloudInfo info,ApeInfoVO infoVo) {
-		if (StringUtils.isBlank(info.getVcodeUrl())) {
+	public DownloadFrame(Component c, BaiduCloudInfo baiduCloudInfo,ApeInfoVO apeInfoVO) {
+		if (StringUtils.isBlank(baiduCloudInfo.getVcodeUrl())) {
 			return;
 		}
+		this.baiduCloudInfo = baiduCloudInfo;
+		this.apeInfoVO = apeInfoVO;
 		this.setTitle("VCode input");
 		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
 		this.setSize(250, 150);
@@ -59,16 +68,16 @@ public class DownloadFrame extends JFrame {
 
 		text = new JTextField();
 		
-		JLabel vcodePic = new JLabel();
-		if(!setVCodePic(vcodePic, info.getVcodeUrl(),text)){
+		vcodePic = new JLabel();
+		if(!setVCodePic()){
 			return;
 		}
 
 		JButton changeButton = new JButton("换个");
-		changeButton.addActionListener(new changeAction(vcodePic, info.getVcodeUrl(),text));	
+		changeButton.addActionListener(new changeAction());	
 
 		JButton checkButton = new JButton("验证");
-		checkButton.addActionListener(new checkAction(this,info,vcodePic, info.getVcodeUrl(),text,infoVo));
+		checkButton.addActionListener(new checkAction());
 
 		contentPanel.add(vcodePic);
 		contentPanel.add(changeButton);
@@ -87,18 +96,17 @@ public class DownloadFrame extends JFrame {
 	 */
 	public class changeAction implements ActionListener {
 
-		private JLabel vcodePic;
-		private String picUrl;
-		private JTextField text;
+//		private JLabel vcodePic;
+//		private String picUrl;
+//		private JTextField text;
+//		private BaiduCloudInfo info;
 
-		/**
-		 * 
-		 */
-		public changeAction(JLabel vcodePic, String picUrl,JTextField text) {
-			this.vcodePic = vcodePic;
-			this.picUrl = picUrl;
-			this.text = text;
-		}
+//		public changeAction(JLabel vcodePic,JTextField text,BaiduCloudInfo info) {
+//			this.vcodePic = vcodePic;
+//			this.picUrl = picUrl;
+//			this.text = text;
+//			this.info = info;
+//		}
 
 		/*
 		 * (non-Javadoc)
@@ -108,14 +116,14 @@ public class DownloadFrame extends JFrame {
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			setVCodePic(vcodePic, picUrl,text);
+			getAndSetVcodePic();
 		}
 
 	}
 	
-	private static boolean setVCodePic(JLabel vcodePic, String picUrl,JTextField text){
+	private boolean setVCodePic(){
 		try {
-			vcodePic.setIcon(new ImageIcon(new URL(picUrl)));
+			vcodePic.setIcon(new ImageIcon(new URL(baiduCloudInfo.getVcodeUrl())));
 			text.setText("");
 			return true;
 		} catch (MalformedURLException e) {
@@ -126,33 +134,42 @@ public class DownloadFrame extends JFrame {
 	}
 
 	/**
+	 * 
+	 */
+	public void getAndSetVcodePic() {
+		BaiduCloudVcode vcodeInfo = BaiduCloudService.getVcodeInfo(baiduCloudInfo.getBdstoken(), baiduCloudInfo.getAppId());
+		baiduCloudInfo.setVcodeStr(vcodeInfo.getVcode_str());
+		baiduCloudInfo.setVcodeUrl(vcodeInfo.getVcode_url());
+		setVCodePic();
+	}
+
+	/**
 	 * @author LMoon
 	 * @date 2017年10月25日
 	 * 
 	 */
 	public class checkAction implements ActionListener {
 		
-		private DownloadFrame frame;
+//		private DownloadFrame frame;
 		
-		private BaiduCloudInfo info;
+//		private BaiduCloudInfo info;		
+//		private JLabel vcodePic;
+//		private String picUrl;
+//		private JTextField text;		
+//		private ApeInfoVO infoVo;
 		
-		private JLabel vcodePic;
-		private String picUrl;
-		private JTextField text;
+//		public checkAction(DownloadFrame frame,BaiduCloudInfo info,JLabel vcodePic, String picUrl,JTextField text,ApeInfoVO infoVo) {
+//			this.frame = frame;
+//			this.info = info;
+//			this.vcodePic = vcodePic;
+//			this.picUrl = picUrl;
+//			this.text = text;
+//			this.infoVo = infoVo;
+//		}
 		
-		private ApeInfoVO infoVo;
-		
-		/**
-		 * 
-		 */
-		public checkAction(DownloadFrame frame,BaiduCloudInfo info,JLabel vcodePic, String picUrl,JTextField text,ApeInfoVO infoVo) {
-			this.frame = frame;
-			this.info = info;
-			this.vcodePic = vcodePic;
-			this.picUrl = picUrl;
-			this.text = text;
-			this.infoVo = infoVo;
-		}
+//		public checkAction(DownloadFrame frame) {
+//			this.frame = frame;
+//		}
 
 		/*
 		 * (non-Javadoc)
@@ -163,12 +180,12 @@ public class DownloadFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String vcode = text.getText();
-			info.setVcodeInput(vcode);
-			BaiduCloudInfo fileUrlInfo = BaiduCloudService.download(infoVo,info.getBdstoken(), info.getAppId(), info.getParams(), info.getFormParams());
+			baiduCloudInfo.setVcodeInput(vcode);
+			BaiduCloudInfo fileUrlInfo = BaiduCloudService.download(apeInfoVO,baiduCloudInfo.getBdstoken(), baiduCloudInfo.getAppId(), baiduCloudInfo.getParams(), baiduCloudInfo.getFormParams());
 			if(fileUrlInfo.getHasDownload()==downloadType.ONGOING){
-				frame.setVisible(false);
+				setVisible(false);
 			}else{
-				setVCodePic(vcodePic, picUrl, text);
+				getAndSetVcodePic();
 			}
 		}
 

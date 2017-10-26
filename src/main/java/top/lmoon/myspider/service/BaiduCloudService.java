@@ -194,13 +194,47 @@ public class BaiduCloudService {
 				vo.setUpdateTime(currentTimeMillis);
 				vo.setDownType(hasDownload);
 				dao.update(vo);
-				DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH + fileName);								
+				DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH , fileName,infoVo.getSongId());								
 			}
 
 		} else if (resultInt == -20) {
 			// String getVCode();
 		}
 		return new BaiduCloudInfo(fileName, fileUrl, bdstoken, app_id, hasDownload,params,formParams);
+	}
+	
+	/**
+	 * @param bdstoken
+	 * @param app_id
+	 */
+	public static BaiduCloudVcode getVcodeInfo(String bdstoken, String app_id) {
+		BaiduCloudVcode baiduCloudVcode = new BaiduCloudVcode();
+		String vCodeGetUrl = "https://pan.baidu.com/api/getvcode?prod=pan&bdstoken=" + bdstoken + "&channel="
+				+ channel + "&clienttype=" + clienttype + "&web=" + web + "&app_id=" + app_id;
+		String result = HttpUtil.get(vCodeGetUrl);
+		JSONObject jo = new JSONObject(result);
+		if (jo.getInt("errno") == 0) {
+			baiduCloudVcode.setVcode_str(jo.getString("vcode"));
+			baiduCloudVcode.setVcode_url(jo.getString("img"));
+		}
+		return baiduCloudVcode;
+	}
+	
+	public static class BaiduCloudVcode{
+		private String vcode_str = "";
+		private String vcode_url = "";
+		public String getVcode_str() {
+			return vcode_str;
+		}
+		public void setVcode_str(String vcode_str) {
+			this.vcode_str = vcode_str;
+		}
+		public String getVcode_url() {
+			return vcode_url;
+		}
+		public void setVcode_url(String vcode_url) {
+			this.vcode_url = vcode_url;
+		}
 	}
 
 	public static class BaiduCloudInfo {
@@ -228,21 +262,26 @@ public class BaiduCloudService {
 			this.params = params;
 			this.formParams = formParams;
 			if (hasDownload==downloadType.NOTSTART && StringUtils.isBlank(fileUrl)) {
-				String vCodeGetUrl = "https://pan.baidu.com/api/getvcode?prod=pan&bdstoken=" + bdstoken + "&channel="
-						+ channel + "&clienttype=" + clienttype + "&web=" + web + "&app_id=" + app_id;
-				String result = HttpUtil.get(vCodeGetUrl);
-				JSONObject jo = new JSONObject(result);
-				if (jo.getInt("errno") == 0) {
-					this.vcode_str = jo.getString("vcode");
-					this.vcode_url = jo.getString("img");
-					this.formParams.put("vcode_str", vcode_str);
-				}
+				BaiduCloudVcode vcodeInfo = getVcodeInfo(bdstoken, app_id);
+				this.vcode_str = vcodeInfo.getVcode_str();
+				this.vcode_url = vcodeInfo.getVcode_url();
+				this.formParams.put("vcode_str", vcode_str);
 			}
 		}
 		
 		public void setVcodeInput(String vcode_input){
 			this.vcode_input = vcode_input;
 			this.formParams.put("vcode_input", vcode_input);
+		}
+
+		public void setVcodeStr(String vcode_str) {
+			this.vcode_str = vcode_str;
+			this.formParams.put("vcode_str", vcode_str);
+		}
+
+		public void setVcodeUrl(String vcode_url) {
+			this.vcode_url = vcode_url;
+			this.formParams.put("vcode_url", vcode_url);
 		}
 
 		public String getBdstoken() {

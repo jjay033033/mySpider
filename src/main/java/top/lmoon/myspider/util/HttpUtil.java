@@ -83,6 +83,7 @@ public class HttpUtil {
             //创建和初始化连接
             uUrl = new URL(url);
             System.out.println("----------url:"+url);
+            System.out.println("----------formParamsStr:"+formParamsStr);
             conn = (HttpURLConnection) uUrl.openConnection();
             conn.setRequestProperty("content-type", "application/x-www-form-urlencoded");
             conn.setRequestMethod(method.toString());
