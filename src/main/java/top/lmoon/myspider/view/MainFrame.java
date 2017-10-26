@@ -150,25 +150,22 @@ public class MainFrame extends JFrame {
 							if(fileVo.getDownType() == downloadType.FINISHED){
 								JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 								return;
-//							}else if(fileVo.getDownType() == downloadType.ONGOING){
-//								JOptionPane.showMessageDialog(getInstance(), "正在下载中哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
-//								return;
 							}
 							
-						}else{
-							fileVo = new ApeFileVO();
-							long currentTimeMillis = System.currentTimeMillis();
-							fileVo.setCreateTime(currentTimeMillis);
-							fileVo.setDownType(downloadType.NOTSTART);
-							fileVo.setSize(vo.getSize());
-							fileVo.setSongId(vo.getSongId());
-							fileVo.setTitle(vo.getTitle());
-							fileVo.setName("");
-							fileVo.setUpdateTime(currentTimeMillis);
-							if(fileDao.update(fileVo)<1){
-								fileDao.insert(fileVo);
-							}
-						}				
+						}
+
+						fileVo = new ApeFileVO();
+						long currentTimeMillis = System.currentTimeMillis();
+						fileVo.setCreateTime(currentTimeMillis);
+						fileVo.setDownType(downloadType.NOTSTART);
+						fileVo.setSize(vo.getSize());
+						fileVo.setSongId(vo.getSongId());
+						fileVo.setTitle(vo.getTitle());
+						fileVo.setName("");
+						fileVo.setUpdateTime(currentTimeMillis);
+						if(fileDao.update(fileVo)<1){
+							fileDao.insert(fileVo);
+						}
 						
 						if (StringUtils.isNotBlank(vo.getPw())) {
 							setSysClipboardText(vo.getPw());
