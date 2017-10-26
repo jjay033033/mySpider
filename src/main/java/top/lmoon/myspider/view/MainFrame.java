@@ -38,18 +38,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.lmoon.myspider.constant.SysConstants;
-import top.lmoon.myspider.dao.ApeFileDAO;
-import top.lmoon.myspider.dao.ApeFileDAOH2DBImpl;
 import top.lmoon.myspider.dao.ApeInfoDAO;
 import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.h2db.H2DBServer;
 import top.lmoon.myspider.service.BaiduCloudService;
+import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
 import top.lmoon.myspider.service.CacheService;
 import top.lmoon.myspider.service.DownloadService;
 import top.lmoon.myspider.service.ThreadPool;
-import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
+import top.lmoon.myspider.util.CommonUtil;
 import top.lmoon.myspider.util.DownloadUtil.downloadType;
-import top.lmoon.myspider.vo.ApeFileVO;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
@@ -89,15 +87,15 @@ public class MainFrame extends JFrame {
 
 	private static Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
-	private static final int VO_COLUMN_INDEX = 4;
+	private static final int VO_COLUMN_INDEX = 6;
 
-	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小", "" };
+	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小","状态","" ,"" };
 
 	private static final int PAGE_SIZE = 20;
 
 	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
 
-	private static ApeFileDAO fileDao = new ApeFileDAOH2DBImpl();
+//	private static ApeFileDAO fileDao = new ApeFileDAOH2DBImpl();
 
 	private static MainFrame instance = new MainFrame();
 
@@ -112,7 +110,7 @@ public class MainFrame extends JFrame {
 	public void drawFrame() {
 		// MainFrame mFrame = getInstance();
 		this.setTitle("My songs");
-		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
+		this.setIconImage(new ImageIcon(SysConstants.TITLE_IMG).getImage());
 		this.setSize(690, 567);
 		this.addWindowListener(new CloseWindowListener());
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式
@@ -145,30 +143,39 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(getInstance(), "正在下载中哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}				
-						ApeFileVO fileVo = fileDao.select(vo.getSongId());
-						if (fileVo != null) {
-							if(fileVo.getDownType() == downloadType.FINISHED){
-								JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
-								return;
-							}
-							
+//						ApeFileVO fileVo = fileDao.select(vo.getSongId());
+//						ApeInfoVO fileVo = dao.select(vo.getSongId());
+//						if (fileVo != null) {
+//							if(fileVo.getDownType() == downloadType.FINISHED){
+//								JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+//								return;
+//							}
+//							
+//						}
+						
+						if(vo.getDownType() == downloadType.FINISHED){
+							JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+							return;
 						}
 
-						fileVo = new ApeFileVO();
-						long currentTimeMillis = System.currentTimeMillis();
-						fileVo.setCreateTime(currentTimeMillis);
-						fileVo.setDownType(downloadType.NOTSTART);
-						fileVo.setSize(vo.getSize());
-						fileVo.setSongId(vo.getSongId());
-						fileVo.setTitle(vo.getTitle());
-						fileVo.setName("");
-						fileVo.setUpdateTime(currentTimeMillis);
-						if(fileDao.update(fileVo)<1){
-							fileDao.insert(fileVo);
-						}
+//						fileVo = new ApeInfoVO();
+//						long currentTimeMillis = System.currentTimeMillis();
+//						fileVo.setCreateTime(currentTimeMillis);
+//						vo.setDownType(downloadType.NOTSTART);
+//						fileVo.setSize(vo.getSize());
+//						fileVo.setSongId(vo.getSongId());
+//						fileVo.setTitle(vo.getTitle());
+//						fileVo.setName("");
+//						fileVo.setUpdateTime(currentTimeMillis);
+//						if(dao.update(fileVo)<1){
+//							dao.insert(fileVo);
+//						}
+						dao.update(vo.getSongId(), downloadType.NOTSTART);
 						
-						if (StringUtils.isNotBlank(vo.getPw())) {
-							setSysClipboardText(vo.getPw());
+						if (!CommonUtil.isBaiduCloudUrl(vo.getLink())||StringUtils.isNotBlank(vo.getPw())) {
+//							setSysClipboardText(vo.getPw());
+							JOptionPane.showMessageDialog(getInstance(), "暂时无法下载这个文件哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+							return;
 						}
 						// desktop.browse(new URI(vo.getLink()));
 						BaiduCloudInfo fileUrlInfo = BaiduCloudService.downloadAndGetFile(vo.getLink(), vo);
@@ -263,6 +270,8 @@ public class MainFrame extends JFrame {
 			data[i][1] = vo.getSinger();
 			data[i][2] = vo.getTitle();
 			data[i][3] = vo.getSize();
+			data[i][4] = vo.getDownType().getName();
+			data[i][5] = vo.getDownType().getImg();
 			data[i][VO_COLUMN_INDEX] = vo;
 		}
 		return data;
@@ -272,8 +281,10 @@ public class MainFrame extends JFrame {
 		jTable.getColumnModel().getColumn(0).setMaxWidth(40);
 		jTable.getColumnModel().getColumn(1).setMaxWidth(150);
 		jTable.getColumnModel().getColumn(3).setMaxWidth(80);
-		jTable.getColumnModel().getColumn(4).setMinWidth(0);
-		jTable.getTableHeader().getColumnModel().getColumn(4).setMaxWidth(0);
+		jTable.getColumnModel().getColumn(4).setMaxWidth(60);
+		jTable.getColumnModel().getColumn(5).setMaxWidth(20);
+		jTable.getColumnModel().getColumn(VO_COLUMN_INDEX).setMinWidth(0);
+		jTable.getTableHeader().getColumnModel().getColumn(VO_COLUMN_INDEX).setMaxWidth(0);
 	}
 
 	private static void updateTotal() {
@@ -290,7 +301,20 @@ public class MainFrame extends JFrame {
 		if (data == null) {
 			JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 		}
-		tableModel = new DefaultTableModel(data, COLUMN_NAME);
+		tableModel = new DefaultTableModel(data, COLUMN_NAME){
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Class<?> getColumnClass(int arg0) {
+				if(arg0==5){
+					return ImageIcon.class;
+				}
+				// TODO Auto-generated method stub
+				return super.getColumnClass(arg0);
+			}
+
+		};
 		jTable = new JTable(tableModel) {
 			private static final long serialVersionUID = 1L;
 

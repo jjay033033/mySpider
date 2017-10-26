@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import top.lmoon.myspider.constant.SysConstants;
 import top.lmoon.myspider.service.BaiduCloudService;
 import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudInfo;
 import top.lmoon.myspider.service.BaiduCloudService.BaiduCloudVcode;
@@ -54,7 +55,7 @@ public class DownloadFrame extends JFrame {
 		this.baiduCloudInfo = baiduCloudInfo;
 		this.apeInfoVO = apeInfoVO;
 		this.setTitle("VCode input");
-		this.setIconImage(new ImageIcon("./res/img/title.png").getImage());
+		this.setIconImage(new ImageIcon(SysConstants.TITLE_IMG).getImage());
 		this.setSize(250, 150);
 		// this.addWindowListener(new CloseWindowListener());
 		// mFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//界面关闭方式

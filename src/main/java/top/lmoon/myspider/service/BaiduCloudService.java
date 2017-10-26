@@ -25,13 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import top.lmoon.myspider.constant.SysConstants;
-import top.lmoon.myspider.dao.ApeFileDAO;
-import top.lmoon.myspider.dao.ApeFileDAOH2DBImpl;
-import top.lmoon.myspider.util.DownloadUtil;
-import top.lmoon.myspider.util.HttpUtil;
-import top.lmoon.myspider.vo.ApeFileVO;
-import top.lmoon.myspider.vo.ApeInfoVO;
+import top.lmoon.myspider.dao.ApeInfoDAO;
+import top.lmoon.myspider.dao.ApeInfoDAOH2DBImpl;
 import top.lmoon.myspider.util.DownloadUtil.downloadType;
+import top.lmoon.myspider.util.HttpUtil;
+import top.lmoon.myspider.vo.ApeInfoVO;
 
 /**
  * @author LMoon
@@ -47,7 +45,9 @@ public class BaiduCloudService {
 	private final static String channel = "chunlei";
 	private final static int web = 1;
 	
-	private static ApeFileDAO dao = new ApeFileDAOH2DBImpl();
+//	private static ApeFileDAO dao = new ApeFileDAOH2DBImpl();
+	
+	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
 	
 	static{
 		init();
@@ -187,7 +187,8 @@ public class BaiduCloudService {
 			fileName = json_data.getString("server_filename");
 			if (StringUtils.isNotBlank(fileUrl)) {
 				hasDownload = downloadType.ONGOING;
-				ApeFileVO vo = new ApeFileVO();
+//				ApeFileVO vo = new ApeFileVO();
+				ApeInfoVO vo = new ApeInfoVO();
 				long currentTimeMillis = System.currentTimeMillis();
 				vo.setSongId(infoVo.getSongId());
 				vo.setName(fileName);

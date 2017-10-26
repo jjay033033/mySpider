@@ -1,6 +1,6 @@
 /**
  * 
- */
+ *//*
 package top.lmoon.myspider.apefile;
 
 import java.io.File;
@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
 import top.lmoon.myspider.constant.SysConstants;
 import top.lmoon.myspider.vo.ApeInfoVO;
 
-/**
+*//**
  * @author LMoon
  * @date 2017年9月30日
  * 
- */
+ *//*
 public class FileReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileReader.class);
@@ -63,3 +63,4 @@ public class FileReader {
 	}
 
 }
+*/

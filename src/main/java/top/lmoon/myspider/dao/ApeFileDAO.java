@@ -1,4 +1,4 @@
-package top.lmoon.myspider.dao;
+/*package top.lmoon.myspider.dao;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,3 +21,4 @@ public interface ApeFileDAO {
 	int count();
 
 }
+*/

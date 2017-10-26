@@ -13,6 +13,11 @@ import org.apache.commons.lang3.StringUtils;
  * 
  */
 public class CommonUtil {
+	
+	public static boolean isBaiduCloudUrl(String str){
+		String regex = "http(s)?://pan.baidu.com/.*";
+		return str.matches(regex);
+	}
 
 	public static String getUUID() {
 		return UUID.randomUUID().toString().replace("-", "");
