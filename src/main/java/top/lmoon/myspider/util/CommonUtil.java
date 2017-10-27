@@ -4,6 +4,8 @@
 package top.lmoon.myspider.util;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,9 +16,19 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class CommonUtil {
 	
-	public static boolean isBaiduCloudUrl(String str){
-		String regex = "http(s)?://pan.baidu.com/.*";
-		return str.matches(regex);
+	public static final String BAIDUCLOUD_REGEX = "http(s)?://pan.baidu.com/s/(.*)";
+	
+	public static boolean isBaiduCloudUrl(String url){
+		return url.matches(BAIDUCLOUD_REGEX);
+	}
+	
+	public static String getBaiduCloudSUrl(String url){
+		Pattern p = Pattern.compile(BAIDUCLOUD_REGEX);
+		Matcher m = p.matcher(url);
+		if(m.find()){
+			return m.group(2);
+		}
+		return "";
 	}
 
 	public static String getUUID() {

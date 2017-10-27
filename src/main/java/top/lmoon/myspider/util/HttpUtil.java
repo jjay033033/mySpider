@@ -50,6 +50,10 @@ public class HttpUtil {
 	};
 	
 	private static String invokeUrl(String url, Map params,Map formParams, Map<String,String> headers, int connectTimeout, int readTimeout, String encoding, HttpMethod method){
+		return invokeUrl(url, params, formParams, headers, connectTimeout, readTimeout, encoding, method, false);
+	}
+	
+	private static String invokeUrl(String url, Map params,Map formParams, Map<String,String> headers, int connectTimeout, int readTimeout, String encoding, HttpMethod method,boolean useBaiduCookies){
         //构造请求参数字符串
         StringBuilder paramsStr = null;
         StringBuilder formParamsStr = null;
@@ -93,6 +97,25 @@ public class HttpUtil {
             conn.setConnectTimeout(connectTimeout);
             //设置读取超时时间
             conn.setReadTimeout(readTimeout);
+            if(useBaiduCookies){
+            	//Cookie:bdshare_firstime=1430100467345; yundetect_httpport=10000; PANWEB=1; BAIDUID=0E5FA8063809E5A490BE361C4478E8AC:FG=1; PSTM=1504521830; BDUSS=d3elRTdHlSUGc4LXlGR2VXWk9zNlUyQjlUcGN-eTFXMi1ua3A0OWRrSWItdkpaTVFBQUFBJCQAAAAAAAAAAAEAAACwn7oKampheTAzMzAzMwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtty1kbbctZbz; STOKEN=e66b0ebd517cc632976a6a405289803dd988b171fe127d9add7ed3467386ffe8; SCRC=0bd4d4126f875e2ae446a664d2083cd7; BIDUPSID=0A571D6E2A6F906180A81E080C8916A8; BDCLND=kR%2BvhmAQ63mamUtaSA%2BaPsrlxHmHTndfCCOwUCe6Cto%3D; MCITY=-%3A; BDRCVFR[mkUqnUt8juD]=mk3SLVN4HKm; PSINO=7; H_PS_PSSID=1438_24868_21091; PANPSC=5039031045846562295%3ASzpdS1fQcpuRW8mR8ESjl4G3Oc33GC15M4DH%2BdaedUTwdEvQxle8NXgXofrWESI4bFwkKFcggCb%2FHSZRhh6%2BPUxwtyYbuYJLYlfDvBP%2BQh4%2F0we9031ImJUVfv2qH2vmU%2BKnHKkLeAF4%2B2HacCA3yTsuktMw6gulbVFcNkn0FT5VvmSKYmKRhKQRuwhxVv30; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507886431,1507887009,1508314722,1508744217; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509069150
+            	//Host:pan.baidu.com
+            	//Origin:https://pan.baidu.com
+            	//Referer:https://pan.baidu.com/share/init?surl=o8hv18m
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+				conn.setRequestProperty("Cookie",
+						"PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
+				conn.setRequestProperty("Accept",
+						"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+				conn.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+				conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+				conn.setRequestProperty("Connection", "keep-alive");
+				conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
+				conn.setRequestProperty("Host", "pan.baidu.com");
+				conn.setRequestProperty("Origin", "https://pan.baidu.com");
+				conn.setRequestProperty("Referer", "https://pan.baidu.com/share/init?surl=hsDZC6g");
+            }
+            
             //指定请求header参数
             if(headers != null && headers.size() > 0){
                 Set<String> headerSet = headers.keySet();
@@ -107,7 +130,7 @@ public class HttpUtil {
                 out.write(formParamsStr.toString());
                 out.flush();
             }
-            
+            System.out.println(conn.getResponseMessage());
             //接收返回结果
             StringBuilder result = new StringBuilder();
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(),encoding));
@@ -170,6 +193,10 @@ public class HttpUtil {
 	
 	public static String post(String url, Map params,Map formParams){
 		return post(url,params,formParams,connectTimeout,readTimeout,charset);
+	}
+	
+	public static String postWithBaiduCookies(String url, Map params,Map formParams){
+		return invokeUrl(url,params,formParams,null,connectTimeout,readTimeout,charset,HttpMethod.POST,true);
 	}
 	
 	/**
