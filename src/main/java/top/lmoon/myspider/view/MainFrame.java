@@ -172,7 +172,7 @@ public class MainFrame extends JFrame {
 //						}
 						dao.update(vo.getSongId(), downloadType.NOTSTART);
 						
-						if (!CommonUtil.isBaiduCloudUrl(vo.getLink())||StringUtils.isNotBlank(vo.getPw())) {
+						if (!CommonUtil.isBaiduCloudUrl(vo.getLink())/*||StringUtils.isNotBlank(vo.getPw())*/) {
 //							setSysClipboardText(vo.getPw());
 							JOptionPane.showMessageDialog(getInstance(), "暂时无法下载这个文件哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 							return;

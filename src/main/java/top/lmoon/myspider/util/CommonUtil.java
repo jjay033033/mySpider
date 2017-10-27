@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class CommonUtil {
 	
-	public static final String BAIDUCLOUD_REGEX = "http(s)?://pan.baidu.com/s/(.*)";
+	public static final String BAIDUCLOUD_REGEX = "http(s)?://pan.baidu.com/s/1(.*)";
 	
 	public static boolean isBaiduCloudUrl(String url){
 		return url.matches(BAIDUCLOUD_REGEX);

@@ -4,6 +4,7 @@
 package top.lmoon.myspider.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,51 +84,16 @@ public class BaiduCloudService {
 			connection.header("Connection", "keep-alive");
 			connection.header("Upgrade-Insecure-Requests", "1");
 
+			Map formParams = new HashMap<>();
 			//
 			if (StringUtils.isNotBlank(vo.getPw())) {
-				Document doc = connection.get();
-				String html = doc.toString();
-				 System.out.println("------html111:" +html);
-				String beginStr = "yunData.setData({";
-				int a = html.indexOf(beginStr);
-				int b = html.indexOf("})", a);
-
-				String info = html.substring(a + beginStr.length() - 1, b + 1);
-				System.out.println("------info:" + info);
-				JSONObject jo = new JSONObject(info);
-//				String bdstoken = jo.getString("bdstoken");
-				Object bdstoken = jo.get("bdstoken");
-				
-//				BaiduCloudVcode vcodeInfo = getVcodeInfo(bdstoken, APP_ID);
-//				System.out.println("vcodeInfo.getVcode_url():"+vcodeInfo.getVcode_url());
-				// https://pan.baidu.com/share/verify?surl=o8hv18m&t=1509069658888
-				//&bdstoken=02e218d159e28931b27315726f540d69&channel=chunlei
-				//&clienttype=0&web=1&app_id=250528&logid=MTUwOTA2OTY1ODg5MjAuOTE2MTg2MzA5OTg1NDY4NA==
-				Map params = new HashMap<>();
-				params.put("bdstoken", bdstoken);
-				params.put("app_id", APP_ID);
-				params.put("channel", CHANNEL);
-				params.put("clienttype", CLIENTTYPE);
-				params.put("web", WEB);
-				params.put("surl", CommonUtil.getBaiduCloudSUrl(url));
-				
-				Map formParams = new HashMap<>();
-				formParams.put("pwd", vo.getPw());
-//				formParams.put("vcode_str", "33324238656332346361663334656637323237633636373637643239666664336662313531383836363438343030303030303030303030303030313530393038393039328FA7B61CF4564B12842EC82B900D126E");
-//				formParams.put("vcode", "8wua");
-				String verify = HttpUtil.postWithBaiduCookies("https://pan.baidu.com/share/verify", params, formParams);
-				System.out.println("------verify:" + verify);
-				System.out.println("------verify:" + new String(verify.getBytes("ISO8859_1"), "UTF-8"));
+				dealPwd(url, vo, connection,formParams);
 			}
-			
-			connection.header("Cookie",
-					"PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; BIDUPSID=C45C3ACB0DAE46D34927F30EEC9A920F; PSTM=1509100435; BDRCVFR[mkUqnUt8juD]=mk3SLVN4HKm; PSINO=6; H_PS_PSSID=1457_19033_21113_23384; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509100923");
-			connection.referrer("https://pan.baidu.com/share/init?surl=hsDZC6g");
 
 			Document doc = connection.get();
 			String html = doc.toString();
 			 System.out.println("------html222:" +html);
-
+//			 logger.error("html:"+html);
 			// String html = HttpRequest.getData(url);
 			String beginStr = "yunData.setData({";
 			int a = html.indexOf(beginStr);
@@ -139,7 +105,8 @@ public class BaiduCloudService {
 
 			String sign = jo.getString("sign");
 			long timestamp = jo.getLong("timestamp");
-			String bdstoken = jo.getString("bdstoken");
+//			String bdstoken = jo.getString("bdstoken");
+			String bdstoken = null;
 			long uk = jo.getLong("uk");
 			long primaryid = jo.getLong("shareid");
 
@@ -167,7 +134,7 @@ public class BaiduCloudService {
 			// params.put("logid",
 			// "MTUwODc0NDY5MzUyNDAuNDgyMzgzNDg4ODYwNjE2OQAA");
 
-			Map formParams = new HashMap<>();
+			
 			formParams.put("uk", uk);
 			formParams.put("primaryid", primaryid);
 			formParams.put("fid_list", fid_list);
@@ -185,6 +152,80 @@ public class BaiduCloudService {
 			logger.error("", e);
 			return null;
 		}
+	}
+
+	private static void dealPwd(String url, ApeInfoVO vo, Connection connection,Map finalFormParams) throws IOException {
+		Document doc = connection.get();
+		String html = doc.toString();
+//				 System.out.println("------html111:" +html);
+		String beginStr = "yunData.setData({";
+		int a = html.indexOf(beginStr);
+		int b = html.indexOf("})", a);
+
+		String info = html.substring(a + beginStr.length() - 1, b + 1);
+//				System.out.println("------info:" + info);
+		JSONObject jo = new JSONObject(info);
+//				String bdstoken = jo.getString("bdstoken");
+		Object bdstoken = jo.get("bdstoken");
+		
+//				BaiduCloudVcode vcodeInfo = getVcodeInfo(bdstoken, APP_ID);
+//				System.out.println("vcodeInfo.getVcode_url():"+vcodeInfo.getVcode_url());
+		// https://pan.baidu.com/share/verify?surl=o8hv18m&t=1509069658888
+		//&bdstoken=02e218d159e28931b27315726f540d69&channel=chunlei
+		//&clienttype=0&web=1&app_id=250528&logid=MTUwOTA2OTY1ODg5MjAuOTE2MTg2MzA5OTg1NDY4NA==
+		Map params = new HashMap<>();
+//				params.put("bdstoken", bdstoken);
+		params.put("app_id", APP_ID);
+		params.put("channel", CHANNEL);
+		params.put("clienttype", CLIENTTYPE);
+		params.put("web", WEB);
+		params.put("surl", CommonUtil.getBaiduCloudSUrl(url));
+		
+		Map formParams = new HashMap<>();
+		formParams.put("pwd", vo.getPw());
+		
+//				conn.setRequestProperty("User-Agent",
+//						"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+//				conn.setRequestProperty("Cookie",
+//						"PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
+//				conn.setRequestProperty("Accept",
+//						"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+//				conn.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+//				conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+//				conn.setRequestProperty("Connection", "keep-alive");
+//				conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
+//				conn.setRequestProperty("Host", "pan.baidu.com");
+//				conn.setRequestProperty("Origin", "https://pan.baidu.com");
+//				conn.setRequestProperty("Referer", "https://pan.baidu.com");
+		
+		Map<String, String> headers = new HashMap<>();
+		headers.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
+		headers.put("Cookie", "PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
+		headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+		headers.put("Accept-Encoding", "gzip, deflate, br");
+		headers.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+		headers.put("Connection", "keep-alive");
+		headers.put("Upgrade-Insecure-Requests", "1");
+		headers.put("Host", "pan.baidu.com");
+		headers.put("Origin", "https://pan.baidu.com");
+		headers.put("Referer", "https://pan.baidu.com");
+
+		String cookies = HttpUtil.postWithBaiduCookies("https://pan.baidu.com/share/verify", params, formParams,
+				headers);
+//				System.out.println("------verify:" + cookies);
+
+//BDCLND=kR%2BvhmAQ63mI02gadFMDpip94R6p4uPD; expires=Sun, 26-Nov-2017 14:16:41 GMT; path=/; domain=pan.baidu.com
+		int bdclndStart = cookies.indexOf("BDCLND=");
+		int bdclndEnd = cookies.indexOf(";", bdclndStart);
+		String bdclnd = cookies.substring(bdclndStart, bdclndEnd);
+//				System.out.println(bdclnd);
+		String newCookies = headers.get("Cookie").replaceAll("BDCLND=[^;]*", bdclnd);
+//				System.out.println(newCookies);
+		connection.header("Cookie",newCookies);
+//		Map sekeyMap = new HashMap<>();
+//		sekeyMap.put("sekey", bdclnd.substring(7));
+		finalFormParams.put("extra", "{\"sekey\":\""+bdclnd.substring(7)+"\"}");
+//				connection.referrer("https://pan.baidu.com/share/init?surl=hsDZC6g");
 	}
 
 	/**
@@ -363,7 +404,22 @@ public class BaiduCloudService {
 		// System.out.println(getUrl("https://pan.baidu.com/s/1qXZHS08"));
 		ApeInfoVO vo = new ApeInfoVO();
 		vo.setPw("ni1w");
-		System.out.println(downloadAndGetFile("http://pan.baidu.com/s/1hsDZC6g", vo));
+		System.out.println(downloadAndGetFile("http://pan.baidu.com/s/1kV3fVev", vo));
 
+		
+//		Map params = new HashMap<>();
+//		params.put("app_id", APP_ID);
+//		params.put("channel", CHANNEL);
+//		params.put("clienttype", CLIENTTYPE);
+//		params.put("web", WEB);
+//		params.put("surl", "kV3fVev");
+//		
+//		Map formParams = new HashMap<>();
+//		formParams.put("pwd", "ni1w");
+//		String verify = HttpUtil.postWithBaiduCookies("https://pan.baidu.com/share/verify", params, formParams);
+//		System.out.println("------verify:" + verify);
+//		System.out.println("------verify:" + new String(verify.getBytes("ISO8859_1"), "UTF-8"));
+		
+		
 	}
 }
