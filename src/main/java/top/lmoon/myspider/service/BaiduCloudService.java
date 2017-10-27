@@ -73,16 +73,16 @@ public class BaiduCloudService {
 			Connection connection = Jsoup.connect(url);
 			connection.userAgent(
 							"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
-			connection.referrer("https://pan.baidu.com");
-			connection.header("Host", "pan.baidu.com");
+//			connection.referrer("https://pan.baidu.com");
+//			connection.header("Host", "pan.baidu.com");
 			connection.header("Cookie",
 					"PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
-			connection.header("Accept",
-					"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-			connection.header("Accept-Encoding", "gzip, deflate, br");
-			connection.header("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
-			connection.header("Connection", "keep-alive");
-			connection.header("Upgrade-Insecure-Requests", "1");
+//			connection.header("Accept",
+//					"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+//			connection.header("Accept-Encoding", "gzip, deflate, br");
+//			connection.header("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+//			connection.header("Connection", "keep-alive");
+//			connection.header("Upgrade-Insecure-Requests", "1");
 
 			Map formParams = new HashMap<>();
 			//
@@ -92,7 +92,7 @@ public class BaiduCloudService {
 
 			Document doc = connection.get();
 			String html = doc.toString();
-			 System.out.println("------html222:" +html);
+//			 System.out.println("------html222:" +html);
 //			 logger.error("html:"+html);
 			// String html = HttpRequest.getData(url);
 			String beginStr = "yunData.setData({";
@@ -184,28 +184,14 @@ public class BaiduCloudService {
 		Map formParams = new HashMap<>();
 		formParams.put("pwd", vo.getPw());
 		
-//				conn.setRequestProperty("User-Agent",
-//						"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
-//				conn.setRequestProperty("Cookie",
-//						"PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
-//				conn.setRequestProperty("Accept",
-//						"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-//				conn.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-//				conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
-//				conn.setRequestProperty("Connection", "keep-alive");
-//				conn.setRequestProperty("Upgrade-Insecure-Requests", "1");
-//				conn.setRequestProperty("Host", "pan.baidu.com");
-//				conn.setRequestProperty("Origin", "https://pan.baidu.com");
-//				conn.setRequestProperty("Referer", "https://pan.baidu.com");
-		
 		Map<String, String> headers = new HashMap<>();
 		headers.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36");
 		headers.put("Cookie", "PANWEB=1; BAIDUID=C45C3ACB0DAE46D34927F30EEC9A920F:FG=1; BDCLND=kR%2BvhmAQ63n%2Bps2G3R%2F6cAkJt2Pwk8NTgeQ2pzTGTyw%3D; Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1507625685%2C1507625751%2C1507886431%2C1507887009; Hm_lpvt_7a3960b6f067eb0085b7f96ff5e660b0=1509099846");
-		headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-		headers.put("Accept-Encoding", "gzip, deflate, br");
-		headers.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
-		headers.put("Connection", "keep-alive");
-		headers.put("Upgrade-Insecure-Requests", "1");
+//		headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+//		headers.put("Accept-Encoding", "gzip, deflate, br");
+//		headers.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.6");
+//		headers.put("Connection", "keep-alive");
+//		headers.put("Upgrade-Insecure-Requests", "1");
 		headers.put("Host", "pan.baidu.com");
 		headers.put("Origin", "https://pan.baidu.com");
 		headers.put("Referer", "https://pan.baidu.com");
@@ -222,8 +208,6 @@ public class BaiduCloudService {
 		String newCookies = headers.get("Cookie").replaceAll("BDCLND=[^;]*", bdclnd);
 //				System.out.println(newCookies);
 		connection.header("Cookie",newCookies);
-//		Map sekeyMap = new HashMap<>();
-//		sekeyMap.put("sekey", bdclnd.substring(7));
 		finalFormParams.put("extra", "{\"sekey\":\""+bdclnd.substring(7)+"\"}");
 //				connection.referrer("https://pan.baidu.com/share/init?surl=hsDZC6g");
 	}
