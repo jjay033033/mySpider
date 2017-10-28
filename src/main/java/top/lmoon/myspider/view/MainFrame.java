@@ -196,8 +196,8 @@ public class MainFrame extends JFrame {
 						BaiduCloudInfo fileUrlInfo = BaiduCloudService.downloadAndGetFile(vo.getLink(), vo);
 						if(fileUrlInfo==null){
 							dao.update(vo.getSongId(), downloadType.UNFINISHED);
-							JOptionPane.showMessageDialog(getInstance(), "下载失败！资源不存在或解析错误哦！", "提示",
-									JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(getInstance(), "下载失败！资源不存在或解析错误哦！\n（"+vo.getTitle()+"）", "提示",
+									JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						if (fileUrlInfo.getHasDownload() == downloadType.NOTSTART) {
