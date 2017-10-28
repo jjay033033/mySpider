@@ -100,9 +100,13 @@ public class BaiduCloudService {
 			int b = html.indexOf("})", a);
 
 			String info = html.substring(a + beginStr.length() - 1, b + 1);
-			// System.out.println("------info:" + info);
+			 System.out.println("------info:" + info);
 			JSONObject jo = new JSONObject(info);
-
+			System.out.println("------jo:" + jo.get("file_list"));
+			if(jo.get("file_list")==null||jo.get("file_list").toString().equalsIgnoreCase("null")){
+				return null;
+			}
+			
 			String sign = jo.getString("sign");
 			long timestamp = jo.getLong("timestamp");
 //			String bdstoken = jo.getString("bdstoken");
@@ -198,6 +202,9 @@ public class BaiduCloudService {
 
 		String cookies = HttpUtil.postWithBaiduCookies("https://pan.baidu.com/share/verify", params, formParams,
 				headers);
+		if(cookies==null){
+			return;
+		}
 //				System.out.println("------verify:" + cookies);
 
 //BDCLND=kR%2BvhmAQ63mI02gadFMDpip94R6p4uPD; expires=Sun, 26-Nov-2017 14:16:41 GMT; path=/; domain=pan.baidu.com
@@ -232,22 +239,55 @@ public class BaiduCloudService {
 		downloadType hasDownload = downloadType.NOTSTART;
 		if (resultInt == 0) {
 			JSONArray jsonArray2 = json_data.getJSONArray("list");
-			json_data = jsonArray2.getJSONObject(0);
-			// 储存文件下载实链
-			fileUrl = json_data.getString("dlink");
-			fileName = json_data.getString("server_filename");
-			if (StringUtils.isNotBlank(fileUrl)) {
+			int size = jsonArray2.length();
+			if(size==1){
+					json_data = jsonArray2.getJSONObject(0);
+					// 储存文件下载实链
+					fileUrl = json_data.getString("dlink");
+					fileName = json_data.getString("server_filename");
+					if (StringUtils.isNotBlank(fileUrl)) {
+						hasDownload = downloadType.ONGOING;
+						ApeInfoVO vo = new ApeInfoVO();
+						long currentTimeMillis = System.currentTimeMillis();
+						vo.setSongId(infoVo.getSongId());
+						vo.setName(fileName);
+						vo.setUpdateTime(currentTimeMillis);
+						vo.setDownType(hasDownload);
+						dao.update(vo);	
+						DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH, fileName, infoVo.getSongId());
+					}	
+			}else if(size>1){
+				StringBuffer fileNameSb = new StringBuffer();
+				for(int i=0;i<size;i++){
+					json_data = jsonArray2.getJSONObject(i);
+					// 储存文件下载实链
+					fileUrl = json_data.getString("dlink");
+					fileName = json_data.getString("server_filename");
+					if (StringUtils.isNotBlank(fileUrl)) {
+						fileNameSb.append(fileName).append(",");
+					}
+				}
+				
 				hasDownload = downloadType.ONGOING;
-				// ApeFileVO vo = new ApeFileVO();
 				ApeInfoVO vo = new ApeInfoVO();
 				long currentTimeMillis = System.currentTimeMillis();
 				vo.setSongId(infoVo.getSongId());
-				vo.setName(fileName);
+				vo.setName(fileNameSb.substring(0, fileNameSb.length()-1));
 				vo.setUpdateTime(currentTimeMillis);
 				vo.setDownType(hasDownload);
-				dao.update(vo);
-				DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH, fileName, infoVo.getSongId());
+				dao.update(vo);	
+				
+				for(int i=0;i<size;i++){
+					json_data = jsonArray2.getJSONObject(i);
+					// 储存文件下载实链
+					fileUrl = json_data.getString("dlink");
+					fileName = json_data.getString("server_filename");
+					if (StringUtils.isNotBlank(fileUrl)) {
+						DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH, fileName, infoVo.getSongId());
+					}
+				}
 			}
+			
 
 		} else if (resultInt == -20) {
 			// String getVCode();

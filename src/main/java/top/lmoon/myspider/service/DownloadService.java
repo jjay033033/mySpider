@@ -44,5 +44,9 @@ public class DownloadService {
 		return set.contains(songId);
 	}
 	
+	public static Set<Integer> getDownloadSet(){
+		return set;
+	}
+	
 
 }

@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -83,19 +84,19 @@ public class MainFrame extends JFrame {
 
 	private static int pageTotal = 0;
 
-	private Desktop desktop = Desktop.getDesktop();
+	// private Desktop desktop = Desktop.getDesktop();
 
-	private static Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+	// private static Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
 
 	private static final int VO_COLUMN_INDEX = 6;
 
-	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小","状态","" ,"" };
+	private static final String[] COLUMN_NAME = { "序号", "歌手", "歌名", "大小", "状态", "", "" };
 
 	private static final int PAGE_SIZE = 20;
 
 	private static ApeInfoDAO dao = new ApeInfoDAOH2DBImpl();
 
-//	private static ApeFileDAO fileDao = new ApeFileDAOH2DBImpl();
+	// private static ApeFileDAO fileDao = new ApeFileDAOH2DBImpl();
 
 	private static MainFrame instance = new MainFrame();
 
@@ -139,46 +140,66 @@ public class MainFrame extends JFrame {
 							return;
 						}
 						ApeInfoVO vo = (ApeInfoVO) tableModel.getValueAt(row, VO_COLUMN_INDEX);
-						if(DownloadService.isDownloading(vo.getSongId())){
-							JOptionPane.showMessageDialog(getInstance(), "正在下载中哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}				
-//						ApeFileVO fileVo = fileDao.select(vo.getSongId());
-//						ApeInfoVO fileVo = dao.select(vo.getSongId());
-//						if (fileVo != null) {
-//							if(fileVo.getDownType() == downloadType.FINISHED){
-//								JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
-//								return;
-//							}
-//							
-//						}
-						
-						if(vo.getDownType() == downloadType.FINISHED){
-							JOptionPane.showMessageDialog(getInstance(), "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+						if (DownloadService.isDownloading(vo.getSongId())) {
+							JOptionPane.showMessageDialog(getInstance(), "正在下载中哦！", "提示",
+									JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
+						// ApeFileVO fileVo = fileDao.select(vo.getSongId());
+						// ApeInfoVO fileVo = dao.select(vo.getSongId());
+						// if (fileVo != null) {
+						// if(fileVo.getDownType() == downloadType.FINISHED){
+						// JOptionPane.showMessageDialog(getInstance(),
+						// "已经下载过了哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+						// return;
+						// }
+						//
+						// }
 
-//						fileVo = new ApeInfoVO();
-//						long currentTimeMillis = System.currentTimeMillis();
-//						fileVo.setCreateTime(currentTimeMillis);
-//						vo.setDownType(downloadType.NOTSTART);
-//						fileVo.setSize(vo.getSize());
-//						fileVo.setSongId(vo.getSongId());
-//						fileVo.setTitle(vo.getTitle());
-//						fileVo.setName("");
-//						fileVo.setUpdateTime(currentTimeMillis);
-//						if(dao.update(fileVo)<1){
-//							dao.insert(fileVo);
-//						}
+						if (vo.getDownType() == downloadType.FINISHED) {
+							// JOptionPane.showMessageDialog(getInstance(),
+							// "已经下载过了哦！", "提示",
+							// JOptionPane.INFORMATION_MESSAGE);
+							// return;
+							int showConfirmDialog = JOptionPane.showConfirmDialog(getInstance(), "已经下载过了哦，是否重新下载？",
+									"提示", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+							if (showConfirmDialog == JOptionPane.NO_OPTION) {
+								return;
+							}
+						}
+
+						// fileVo = new ApeInfoVO();
+						// long currentTimeMillis = System.currentTimeMillis();
+						// fileVo.setCreateTime(currentTimeMillis);
+						// vo.setDownType(downloadType.NOTSTART);
+						// fileVo.setSize(vo.getSize());
+						// fileVo.setSongId(vo.getSongId());
+						// fileVo.setTitle(vo.getTitle());
+						// fileVo.setName("");
+						// fileVo.setUpdateTime(currentTimeMillis);
+						// if(dao.update(fileVo)<1){
+						// dao.insert(fileVo);
+						// }
 						dao.update(vo.getSongId(), downloadType.NOTSTART);
-						
-						if (!CommonUtil.isBaiduCloudUrl(vo.getLink())/*||StringUtils.isNotBlank(vo.getPw())*/) {
-//							setSysClipboardText(vo.getPw());
-							JOptionPane.showMessageDialog(getInstance(), "暂时无法下载这个文件哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
+
+						if (!CommonUtil.isBaiduCloudUrl(
+								vo.getLink())/*
+												 * ||StringUtils.isNotBlank(vo.
+												 * getPw())
+												 */) {
+							// setSysClipboardText(vo.getPw());
+							JOptionPane.showMessageDialog(getInstance(), "暂时无法下载这个文件哦！", "提示",
+									JOptionPane.INFORMATION_MESSAGE);
 							return;
 						}
 						// desktop.browse(new URI(vo.getLink()));
 						BaiduCloudInfo fileUrlInfo = BaiduCloudService.downloadAndGetFile(vo.getLink(), vo);
+						if(fileUrlInfo==null){
+							dao.update(vo.getSongId(), downloadType.UNFINISHED);
+							JOptionPane.showMessageDialog(getInstance(), "下载失败！资源不存在或解析错误哦！", "提示",
+									JOptionPane.INFORMATION_MESSAGE);
+							return;
+						}
 						if (fileUrlInfo.getHasDownload() == downloadType.NOTSTART) {
 							DownloadFrame downloadFrame = new DownloadFrame(getInstance(), fileUrlInfo, vo);
 						}
@@ -190,7 +211,6 @@ public class MainFrame extends JFrame {
 				}
 			};
 			ThreadPool.submit(runnable);
-			
 
 		}
 
@@ -301,13 +321,13 @@ public class MainFrame extends JFrame {
 		if (data == null) {
 			JOptionPane.showMessageDialog(getInstance(), "没有数据哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
 		}
-		tableModel = new DefaultTableModel(data, COLUMN_NAME){
+		tableModel = new DefaultTableModel(data, COLUMN_NAME) {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Class<?> getColumnClass(int arg0) {
-				if(arg0==5){
+				if (arg0 == 5) {
 					return ImageIcon.class;
 				}
 				// TODO Auto-generated method stub
@@ -441,16 +461,23 @@ public class MainFrame extends JFrame {
 		return southPanel;
 	}
 
-	private static class CloseWindowListener extends WindowAdapter {		
+	private static class CloseWindowListener extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			int downloadThreadCounter = DownloadService.getDownloadThreadCounter();
-			if(downloadThreadCounter>0){
-//				JOptionPane.showMessageDialog(getInstance(), "还有"+downloadThreadCounter+"个任务正在下载哦！", "提示", JOptionPane.INFORMATION_MESSAGE);
-				int showConfirmDialog = JOptionPane.showConfirmDialog(getInstance(), "还有"+downloadThreadCounter+"个任务正在下载哦，确定关闭吗？", "提示", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-				if(showConfirmDialog==JOptionPane.NO_OPTION){
+			if (downloadThreadCounter > 0) {
+				int showConfirmDialog = JOptionPane.showConfirmDialog(getInstance(),
+						"还有" + downloadThreadCounter + "个任务正在下载哦，确定关闭吗？", "提示", JOptionPane.YES_NO_OPTION,
+						JOptionPane.INFORMATION_MESSAGE);
+				if (showConfirmDialog == JOptionPane.NO_OPTION) {
 					return;
 				}
+
+				Set<Integer> downloadSet = DownloadService.getDownloadSet();
+				for (Integer songId : downloadSet) {
+					dao.update(songId, downloadType.UNFINISHED);
+				}
 			}
+
 			H2DBServer.stop();
 			System.exit(0);
 		}
@@ -459,11 +486,11 @@ public class MainFrame extends JFrame {
 	/**
 	 * 将字符串复制到剪切板。
 	 */
-	private static void setSysClipboardText(String writeMe) {
-		Clipboard clip = defaultToolkit.getSystemClipboard();
-		Transferable tText = new StringSelection(writeMe);
-		clip.setContents(tText, null);
-	}
+	// private static void setSysClipboardText(String writeMe) {
+	// Clipboard clip = defaultToolkit.getSystemClipboard();
+	// Transferable tText = new StringSelection(writeMe);
+	// clip.setContents(tText, null);
+	// }
 
 	/**
 	 * @param args

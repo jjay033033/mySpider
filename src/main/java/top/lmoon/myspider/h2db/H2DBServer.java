@@ -34,6 +34,8 @@ public class H2DBServer {
 		if(server!=null){
 			server.stop();
 			server = null;
+			System.out.println("h2数据库已关闭！");
+			logger.info("h2数据库已关闭！");
 		}
 	}
 	
