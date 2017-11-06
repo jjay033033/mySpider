@@ -23,6 +23,8 @@ public class SysConstants {
 	
 	public static final String FILE_PATH = RES_PATH+"music/";
 	
+	public static final String FILE_TMP_PATH = FILE_PATH+"tmp/";
+	
 	public static final String IMG_PATH = RES_PATH+"img/";
 	
 	public static final String IMG_DOWNLOAD_TYPE_PATH = IMG_PATH+"download/";

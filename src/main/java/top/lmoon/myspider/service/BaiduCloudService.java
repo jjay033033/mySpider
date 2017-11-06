@@ -55,8 +55,12 @@ public class BaiduCloudService {
 	 */
 	private static void init() {
 		File downloadPath = new File(SysConstants.FILE_PATH);
+		File downloadTmpPath = new File(SysConstants.FILE_TMP_PATH);
 		if (!downloadPath.exists() || !downloadPath.isDirectory()) {
 			downloadPath.mkdirs();
+		}		
+		if (!downloadTmpPath.exists() || !downloadTmpPath.isDirectory()) {
+			downloadTmpPath.mkdirs();
 		}
 //		System.setProperty("http.proxySet", "true"); 
 //		System.setProperty("http.proxyHost", "127.0.0.1"); 
@@ -254,7 +258,7 @@ public class BaiduCloudService {
 						vo.setUpdateTime(currentTimeMillis);
 						vo.setDownType(hasDownload);
 						dao.update(vo);	
-						DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH, fileName, infoVo.getSongId());
+						DownloadService.asyncDownload(fileUrl, fileName, infoVo.getSongId());
 					}	
 			}else if(size>1){
 				StringBuffer fileNameSb = new StringBuffer();
@@ -283,7 +287,7 @@ public class BaiduCloudService {
 					fileUrl = json_data.getString("dlink");
 					fileName = json_data.getString("server_filename");
 					if (StringUtils.isNotBlank(fileUrl)) {
-						DownloadService.asyncDownload(fileUrl, SysConstants.FILE_PATH, fileName, infoVo.getSongId());
+						DownloadService.asyncDownload(fileUrl, fileName, infoVo.getSongId());
 					}
 				}
 			}
