@@ -42,7 +42,7 @@ public class DownloadService {
 				set.remove(songId);
 			}
 		};
-		ThreadPool.submit(r);
+		ThreadPool.submitDownload(r);
 
 	}
 
