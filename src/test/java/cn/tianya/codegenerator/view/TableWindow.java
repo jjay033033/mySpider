@@ -61,7 +61,7 @@ public class TableWindow {
 	private JTextArea textArea;
 	private JFrame frame;
 
-	private JTable jTable;
+	private MyTable jTable;
 	private DefaultTableModel tableModel;
 
 	public TableWindow() {
@@ -296,7 +296,7 @@ public class TableWindow {
 				}
 				tableModel = new DefaultTableModel(data, new String[] { "选择",
 						"表名" });
-				jTable = new JTable(tableModel);
+				jTable = new MyTable(tableModel);
 				
 				
 //				TableColumnModel tcm = jTable.getColumnModel();
