@@ -19,11 +19,15 @@ public class Main {
 		int selectMaxSingerId = dao.selectMaxSingerId();
 		SingerIdFactory.setCounter(selectMaxSingerId);
 		ConcurrentHashMap<String, Integer> selectSingerIdMap = dao.selectSingerIdMap();
-		SingerIdFactory.setMap(selectSingerIdMap);
+		if(selectSingerIdMap!=null){
+			SingerIdFactory.setMap(selectSingerIdMap);
+		}
 		int selectMaxSongId = dao.selectMaxSongId();
 		SongIdFactory.setCounter(selectMaxSongId);
 		ConcurrentHashMap<Integer, Integer> selectSongIdForSingerMap = dao.selectSongIdForSingerMap();
-		SongIdFactory.setMap(selectSongIdForSingerMap);
+		if(selectSongIdForSingerMap!=null){
+			SongIdFactory.setMap(selectSongIdForSingerMap);
+		}
 		System.out.println(selectMaxSingerId);
 		System.out.println(selectSingerIdMap);
 		System.out.println(selectMaxSongId);
