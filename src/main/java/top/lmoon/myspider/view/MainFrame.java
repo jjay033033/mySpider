@@ -35,6 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,10 @@ public class MainFrame extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = -8826403470545143680L;
+	
+	static {
+		PropertyConfigurator.configure(System.getProperty("user.dir") + "/res/log4j.properties");
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(MainFrame.class);
 
