@@ -17,25 +17,20 @@ public class SingerIdFactory {
 
 	private static AtomicInteger counter = new AtomicInteger(0);
 
-	private static SingerIdFactory instance;
-
 	private SingerIdFactory() {
 	}
 
 	public static SingerIdFactory getInstance() {
-		if (instance == null) {
-			synchronized (SingerIdFactory.class) {
-				if (instance == null) {
-					instance = new SingerIdFactory();
-				}
-			}
-		}
-		return instance;
+		return SingerIdFactoryHolder.SINGER_ID_FACTORY;
+	}
+	
+	private static class SingerIdFactoryHolder{
+		private static final SingerIdFactory SINGER_ID_FACTORY = new SingerIdFactory();
 	}
 
 	public int getSingerId(String singer) {
 		int id = 0;
-		synchronized (map) {
+		synchronized (this) {
 			if (map.containsKey(singer)) {
 				id = map.get(singer);
 			} else {
