@@ -29,7 +29,7 @@
 			<directory>res</directory>
 			<outputDirectory>res</outputDirectory>
 			<includes>
-				<include>*/*</include>
+				<include>**/**/*</include>
 			</includes>
 			<excludes>
 				<exclude>music/*</exclude>
